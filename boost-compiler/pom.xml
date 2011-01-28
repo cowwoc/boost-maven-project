@@ -34,7 +34,7 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.googlecode</groupId>
+				<groupId>org.boost</groupId>
 				<artifactId>maven-boost-plugin</artifactId>
 				<version>0.1-SNAPSHOT</version>
 				<executions>

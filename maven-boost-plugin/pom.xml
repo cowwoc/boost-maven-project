@@ -7,13 +7,13 @@
 		<artifactId>oss-parent</artifactId>
 		<version>5</version>
 	</parent>
-	<groupId>com.googlecode</groupId>
+	<groupId>org.boost</groupId>
 	<artifactId>maven-boost-plugin</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 	<name>Boost Maven Plugin</name>
 	<description>Boost Maven Plugin</description>
-	<url>http://code.google.com/p/maven-boost-plugin/</url>
+	<url>http://code.google.com/p/maven-boost-project/</url>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -22,9 +22,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<url>https://maven-boost-plugin.googlecode.com/hg/</url>
-		<connection>scm:hg:https://maven-boost-plugin.googlecode.com/hg/</connection>
-		<developerConnection>scm:hg:https://maven-boost-plugin.googlecode.com/hg/</developerConnection>
+		<url>https://maven-boost-project.googlecode.com/hg/</url>
+		<connection>scm:hg:https://maven-boost-project.googlecode.com/hg/</connection>
+		<developerConnection>scm:hg:https://maven-boost-project.googlecode.com/hg/</developerConnection>
 	</scm>
 	<developers>
 		<developer>
