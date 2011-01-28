@@ -1,0 +1,71 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>5</version>
+	</parent>
+	<groupId>org.boost</groupId>
+	<artifactId>boost</artifactId>
+	<version>1.45.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>Boost</name>
+	<description>Boost Module</description>
+	<url>http://code.google.com/p/boost/</url>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://boost-maven-project.googlecode.com/hg/</url>
+		<connection>scm:hg:https://boost-maven-project.googlecode.com/hg/</connection>
+		<developerConnection>scm:hg:https://boost-maven-project.googlecode.com/hg/</developerConnection>
+	</scm>
+	<developers>
+		<developer>
+			<id>cowwoc</id>
+			<name>Gili Tzabari</name>
+		</developer>
+	</developers>
+	<modules>
+		<module>boost-compiler</module>
+		<module>boost-api</module>
+		<module>boost-date-time</module>
+		<module>boost-filesystem</module>
+		<module>boost-graph</module>
+		<module>boost-iostreams</module>
+		<module>boost-math</module>
+		<module>boost-program-options</module>
+		<module>boost-random</module>
+		<module>boost-regex</module>
+		<module>boost-serialization</module>
+		<module>boost-signals</module>
+		<module>boost-system</module>
+		<module>boost-test</module>
+		<module>boost-thread</module>
+		<module>boost-wave</module>
+	</modules>
+	<profiles>
+		<profile>
+			<id>windows-vs10-i386</id>
+			<properties>
+				<cmake.generator>Visual Studio 10</cmake.generator>
+				<addressModel>32</addressModel>
+				<native.classifier>windows-vs10-i386</native.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>windows-vs10-amd64</id>
+			<properties>
+				<cmake.generator>Visual Studio 10</cmake.generator>
+				<addressModel>64</addressModel>
+				<native.classifier>windows-vs10-amd64</native.classifier>
+			</properties>
+		</profile>
+	</profiles>
+</project>

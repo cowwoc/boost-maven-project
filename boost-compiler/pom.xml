@@ -1,0 +1,84 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.boost</groupId>
+		<artifactId>boost</artifactId>
+		<version>1.45.0-SNAPSHOT</version>
+	</parent>
+	<groupId>org.boost</groupId>
+	<artifactId>boost-compiler</artifactId>
+	<packaging>jar</packaging>
+	<name>Boost Compiler</name>
+	<description>Boost compiler</description>
+	<url>http://code.google.com/p/boost-maven-project/</url>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://boost-maven-project.googlecode.com/hg/</url>
+		<connection>scm:hg:https://boost-maven-project.googlecode.com/hg/</connection>
+		<developerConnection>scm:hg:https://boost-maven-project.googlecode.com/hg/</developerConnection>
+	</scm>
+	<developers>
+		<developer>
+			<id>cowwoc</id>
+			<name>Gili Tzabari</name>
+		</developer>
+	</developers>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.googlecode</groupId>
+				<artifactId>maven-boost-plugin</artifactId>
+				<version>0.1-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<id>boost-sources</id>
+						<goals>
+							<goal>getSources</goal>
+						</goals>
+						<configuration>
+							<version>1.45.0</version>
+						</configuration>
+					</execution>
+					<execution>
+						<id>boost-compile</id>
+						<goals>
+							<goal>generateBinaries</goal>
+						</goals>
+						<configuration>
+							<version>1.45.0</version>
+							<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
+							<addressModel>${addressModel}</addressModel>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.1</version>
+				<configuration>
+					<classifier>${native.classifier}</classifier>
+					<classesDirectory>${project.build.directory}/dependency/boost</classesDirectory>
+					<includes>
+						<include>boost/**</include>
+						<include>stage${addressModel}/**</include>
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.3.1</version>
+			</plugin>
+		</plugins>
+	</build>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+</project>
