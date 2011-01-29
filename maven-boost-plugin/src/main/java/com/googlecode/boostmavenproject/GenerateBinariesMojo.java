@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 /**
  * Compiles the Boost C++ library and installs it into the local Maven repository.
  *
- * @goal generateBinaries
+ * @goal generate-binaries
  * @phase compile
  * @author Gili Tzabari
  */

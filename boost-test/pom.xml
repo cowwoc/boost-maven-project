@@ -3,11 +3,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.boost</groupId>
+		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
 		<version>1.45.0-SNAPSHOT</version>
 	</parent>
-	<groupId>org.boost</groupId>
+	<groupId>com.googlecode.boost-maven-project</groupId>
 	<artifactId>boost-test</artifactId>
 	<packaging>jar</packaging>
 	<name>Boost Test</name>
