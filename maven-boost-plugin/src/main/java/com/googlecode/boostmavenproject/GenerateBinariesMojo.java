@@ -59,8 +59,12 @@ public class GenerateBinariesMojo
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
 	private String addressModel;
 	/**
-	 * The maven plugin manager.
-	 *
+	 * Extra arguments to pass to the build process.
+	 * 
+	 * @parameter
+	 */
+	private List<String> arguments;
+	/**
 	 * @component
 	 * @required
 	 */
@@ -71,6 +75,7 @@ public class GenerateBinariesMojo
 	 *
 	 * @parameter expression="${localRepository}"
 	 * @required
+	 * @readonly
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
 	private ArtifactRepository localRepository;
@@ -87,6 +92,7 @@ public class GenerateBinariesMojo
 	/**
 	 * @parameter expression="${project}"
 	 * @required
+	 * @readonly
 	 */
 	@SuppressWarnings(
 	{
@@ -96,6 +102,7 @@ public class GenerateBinariesMojo
 	/**
 	 * @parameter expression="${session}"
 	 * @required
+	 * @readonly
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
 	private MavenSession session;
@@ -156,10 +163,15 @@ public class GenerateBinariesMojo
 			"exec-maven-plugin", "1.2");
 		Element executableElement = new Element("executable", process.command().get(0));
 
-		List<Element> arguments = Lists.newArrayList();
+		List<Element> argumentsList = Lists.newArrayList();
 		List<String> command = process.command();
 		for (String entry: command.subList(1, command.size()))
-			arguments.add(new Element("argument", entry));
+			argumentsList.add(new Element("argument", entry));
+		if (arguments!=null)
+		{
+			for (String entry: arguments)
+				argumentsList.add(new Element("argument", entry));
+		}
 
 		File workingDirectory = process.directory();
 		if (workingDirectory == null)
@@ -167,7 +179,7 @@ public class GenerateBinariesMojo
 		Element workingDirectoryElement = new Element("workingDirectory", workingDirectory.
 			getAbsolutePath());
 
-		Element argumentsElement = new Element("arguments", arguments.toArray(new Element[0]));
+		Element argumentsElement = new Element("arguments", argumentsList.toArray(new Element[0]));
 		List<Element> environmentVariables = Lists.newArrayList();
 		for (Entry<String, String> entry: process.environment().entrySet())
 			environmentVariables.add(new Element(entry.getKey(), entry.getValue()));

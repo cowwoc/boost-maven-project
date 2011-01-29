@@ -53,7 +53,6 @@ public class GetSourceslMojo
 	 * The maven plugin manager.
 	 *
 	 * @component
-	 * @required
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
 	private PluginManager pluginManager;
@@ -62,12 +61,11 @@ public class GetSourceslMojo
 	 *
 	 * @parameter expression="${localRepository}"
 	 * @required
+	 * @readonly
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
 	private ArtifactRepository localRepository;
 	/**
-	 * Resolves Artifacts in the local repository.
-	 * 
 	 * @component
 	 */
 	private ArtifactResolver artifactResolver;
@@ -78,12 +76,14 @@ public class GetSourceslMojo
 	/**
 	 * @parameter expression="${project}"
 	 * @required
+	 * @readonly
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
 	private MavenProject project;
 	/**
 	 * @parameter expression="${session}"
 	 * @required
+	 * @readonly
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
 	private MavenSession session;

@@ -54,8 +54,11 @@
 						</goals>
 						<configuration>
 							<version>1.45.0</version>
-							<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
+							<outputDirectory>${project.build.directory}/dependency</outputDirectory>
 							<addressModel>${addressModel}</addressModel>
+							<arguments>
+								<argument>--without-python</argument>
+							</arguments>
 						</configuration>
 					</execution>
 				</executions>
@@ -65,7 +68,7 @@
 				<version>2.3.1</version>
 				<configuration>
 					<classifier>${native.classifier}</classifier>
-					<classesDirectory>${project.build.directory}/dependency/boost</classesDirectory>
+					<classesDirectory>${project.build.directory}/dependency</classesDirectory>
 					<includes>
 						<include>boost/**</include>
 						<include>stage${addressModel}/**</include>
