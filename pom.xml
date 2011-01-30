@@ -13,7 +13,7 @@
 	<packaging>pom</packaging>
 	<name>Boost</name>
 	<description>Boost Module</description>
-	<url>http://code.google.com/p/boost/</url>
+	<url>http://code.google.com/p/boost-maven-project/</url>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
