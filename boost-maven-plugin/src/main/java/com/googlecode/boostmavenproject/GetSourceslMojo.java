@@ -93,7 +93,7 @@ public class GetSourceslMojo
 	public void execute()
 		throws MojoExecutionException, MojoFailureException
 	{
-		final String groupId = "org.boost";
+		final String groupId = "com.googlecode.boost-maven-project";
 		final String artifactId = "boost-sources";
 		Artifact artifact = getArtifact(groupId, artifactId, version, "sources");
 

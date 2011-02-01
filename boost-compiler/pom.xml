@@ -67,7 +67,7 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.1</version>
 				<configuration>
-					<classifier>${native.classifier}</classifier>
+					<classifier>${classifier}</classifier>
 					<classesDirectory>${project.build.directory}/dependency</classesDirectory>
 					<includes>
 						<include>boost/**</include>

@@ -33,6 +33,7 @@
 		</developer>
 	</developers>
 	<modules>
+		<module>boost-maven-plugin</module>
 		<module>boost-compiler</module>
 		<module>boost-api</module>
 		<module>boost-date-time</module>
@@ -56,7 +57,7 @@
 			<properties>
 				<cmake.generator>Visual Studio 10</cmake.generator>
 				<addressModel>32</addressModel>
-				<native.classifier>windows-vs10-i386</native.classifier>
+				<classifier>windows-vs10-i386</classifier>
 			</properties>
 		</profile>
 		<profile>
@@ -64,7 +65,7 @@
 			<properties>
 				<cmake.generator>Visual Studio 10</cmake.generator>
 				<addressModel>64</addressModel>
-				<native.classifier>windows-vs10-amd64</native.classifier>
+				<classifier>windows-vs10-amd64</classifier>
 			</properties>
 		</profile>
 	</profiles>

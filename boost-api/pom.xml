@@ -46,7 +46,7 @@
 								<artifactItem>
 									<groupId>${project.groupId}</groupId>
 									<artifactId>boost-compiler</artifactId>
-									<classifier>${native.classifier}</classifier>
+									<classifier>${classifier}</classifier>
 									<version>${project.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>

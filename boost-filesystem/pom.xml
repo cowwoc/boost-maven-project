@@ -46,7 +46,7 @@
 								<artifactItem>
 									<groupId>${project.groupId}</groupId>
 									<artifactId>boost-compiler</artifactId>
-									<classifier>${native.classifier}</classifier>
+									<classifier>${classifier}</classifier>
 									<version>${project.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
@@ -62,7 +62,7 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.1</version>
 				<configuration>
-					<classifier>${native.classifier}</classifier>
+					<classifier>${classifier}</classifier>
 					<classesDirectory>${project.build.directory}/dependency/boost/stage${addressModel}</classesDirectory>
 					<includes>
 						<include>lib/**</include>
