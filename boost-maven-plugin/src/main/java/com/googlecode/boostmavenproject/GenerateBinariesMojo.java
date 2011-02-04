@@ -112,7 +112,7 @@ public class GenerateBinariesMojo
 	public void execute()
 		throws MojoExecutionException, MojoFailureException
 	{
-		final String groupId = "org.boost";
+		final String groupId = "com.googlecode.boost-maven-project";
 		final String artifactId = "boost-sources";
 		final String classifier = "sources";
 		if (!addressModel.equals("32") && !addressModel.equals("64"))
@@ -167,7 +167,7 @@ public class GenerateBinariesMojo
 		List<String> command = process.command();
 		for (String entry: command.subList(1, command.size()))
 			argumentsList.add(new Element("argument", entry));
-		if (arguments!=null)
+		if (arguments != null)
 		{
 			for (String entry: arguments)
 				argumentsList.add(new Element("argument", entry));
