@@ -1,18 +1,18 @@
 package com.googlecode.boostmavenproject;
 
+import java.util.Collections;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.util.xml.Xpp3DomUtils;
+import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * Executes an arbitrary mojo using a fluent interface.  This is meant to be executed within the context of a Maven 2
@@ -41,8 +41,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
  */
 public class MojoExecutor
 {
-	private static final String FAKE_EXECUTION_ID = "virtual-execution";
-
 	/**
 	 * Entry point for executing a mojo
 	 *
@@ -57,36 +55,12 @@ public class MojoExecutor
 	{
 		if (configuration == null)
 			throw new NullPointerException("configuration may not be null");
-		Map executionMap = null;
 		try
 		{
 			MavenSession session = env.getMavenSession();
 
-			List buildPlugins = env.getMavenProject().getBuildPlugins();
-
-			// You'd think we could just add the configuration to the mojo execution, but then it merges with the plugin config
-			// dominate over the mojo config, so we are forced to fake the config as if it was declared as an execution in
-			// the pom so that the merge happens correctly
-			if (buildPlugins != null)
-			{
-				for (Iterator iterator = buildPlugins.iterator(); iterator.hasNext();)
-				{
-					Plugin pomPlugin = (Plugin) iterator.next();
-
-					if (plugin.getGroupId().equals(pomPlugin.getGroupId()) && plugin.getArtifactId().equals(pomPlugin.
-						getArtifactId()))
-					{
-						PluginExecution exec = new PluginExecution();
-						exec.setConfiguration(configuration);
-						executionMap = pomPlugin.getExecutionsAsMap();
-						executionMap.put(FAKE_EXECUTION_ID, exec);
-						break;
-					}
-				}
-			}
-
-			PluginDescriptor pluginDescriptor = env.getPluginManager().verifyPlugin(plugin, env.
-				getMavenProject(), session.getSettings(), session.getLocalRepository());
+			PluginDescriptor pluginDescriptor = env.getPluginManager().loadPlugin(plugin,
+				Collections.<RemoteRepository>emptyList(), session.getRepositorySession());
 			MojoDescriptor mojo = pluginDescriptor.getMojo(goal);
 			if (mojo == null)
 			{
@@ -95,40 +69,46 @@ public class MojoExecutor
 																				 + plugin.getArtifactId() + ":"
 																				 + plugin.getVersion());
 			}
-			MojoExecution exec = null;
-			if (executionMap != null)
-			{
-				exec = new MojoExecution(mojo, FAKE_EXECUTION_ID);
-			}
-			else
-			{
-				exec = new MojoExecution(mojo, configuration);
-			}
-			env.getPluginManager().executeMojo(env.getMavenProject(), exec, env.getMavenSession());
+			configuration = Xpp3DomUtils.mergeXpp3Dom(configuration,
+				toXpp3Dom(mojo.getMojoConfiguration()));
+			MojoExecution exec = new MojoExecution(mojo, configuration);
+			env.getPluginManager().executeMojo(session, exec);
 		}
 		catch (Exception e)
 		{
 			throw new MojoExecutionException("Unable to execute mojo", e);
 		}
-		finally
-		{
-			if (executionMap != null)
-				executionMap.remove(FAKE_EXECUTION_ID);
-		}
+	}
+
+	/**
+	 * Converts PlexusConfiguration to a Xpp3Dom.
+	 *
+	 * @param config the PlexusConfiguration
+	 * @return the Xpp3Dom representation of the PlexusConfiguration
+	 */
+	private static Xpp3Dom toXpp3Dom(PlexusConfiguration config)
+	{
+		Xpp3Dom result = new Xpp3Dom(config.getName());
+		result.setValue(config.getValue(null));
+		for (String name: config.getAttributeNames())
+			result.setAttribute(name, config.getAttribute(name));
+		for (PlexusConfiguration child: config.getChildren())
+			result.addChild(toXpp3Dom(child));
+		return result;
 	}
 
 	/**
 	 * Constructs the {@link ExecutionEnvironment} instance fluently
 	 * @param mavenProject The current Maven project
 	 * @param mavenSession The current Maven session
-	 * @param pluginManager The Maven plugin manager
+	 * @param pluginManager The Build plugin manager
 	 * @return The execution environment
 	 * @throws NullPointerException if mavenProject, mavenSession or pluginManager
 	 *   are null
 	 */
 	public static ExecutionEnvironment executionEnvironment(MavenProject mavenProject,
 																													MavenSession mavenSession,
-																													PluginManager pluginManager)
+																													BuildPluginManager pluginManager)
 	{
 		return new ExecutionEnvironment(mavenProject, mavenSession, pluginManager);
 	}
@@ -142,9 +122,7 @@ public class MojoExecutor
 	{
 		Xpp3Dom dom = new Xpp3Dom("configuration");
 		for (Element e: elements)
-		{
 			dom.addChild(e.toDom());
-		}
 		return dom;
 	}
 
@@ -290,10 +268,10 @@ public class MojoExecutor
 	{
 		private final MavenProject mavenProject;
 		private final MavenSession mavenSession;
-		private final PluginManager pluginManager;
+		private final BuildPluginManager pluginManager;
 
 		public ExecutionEnvironment(MavenProject mavenProject, MavenSession mavenSession,
-																PluginManager pluginManager)
+																BuildPluginManager pluginManager)
 		{
 			if (mavenProject == null)
 				throw new NullPointerException("mavenProject may not be null");
@@ -316,7 +294,7 @@ public class MojoExecutor
 			return mavenSession;
 		}
 
-		public PluginManager getPluginManager()
+		public BuildPluginManager getPluginManager()
 		{
 			return pluginManager;
 		}

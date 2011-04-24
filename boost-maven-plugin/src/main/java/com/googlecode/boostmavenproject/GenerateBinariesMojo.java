@@ -13,13 +13,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 import java.util.List;
 import java.util.Map.Entry;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -66,29 +63,9 @@ public class GenerateBinariesMojo
 	private List<String> arguments;
 	/**
 	 * @component
-	 * @required
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
-	private PluginManager pluginManager;
-	/**
-	 * The local maven repository.
-	 *
-	 * @parameter expression="${localRepository}"
-	 * @required
-	 * @readonly
-	 */
-	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
-	private ArtifactRepository localRepository;
-	/**
-	 * Resolves Artifacts in the local repository.
-	 * 
-	 * @component
-	 */
-	private ArtifactResolver artifactResolver;
-	/**
-	 * @component
-	 */
-	private ArtifactFactory artifactFactory;
+	private BuildPluginManager pluginManager;
 	/**
 	 * @parameter expression="${project}"
 	 * @required
@@ -239,7 +216,7 @@ public class GenerateBinariesMojo
 			for (File child: children)
 				delete(child);
 		}
-		if (!file.delete())
+		if (file.exists() && !file.delete())
 			throw new IOException("Cannot delete " + file.getAbsolutePath());
 	}
 
@@ -258,7 +235,7 @@ public class GenerateBinariesMojo
 		throws MojoExecutionException
 	{
 		Plugin unpackPlugin = MojoExecutor.plugin("org.apache.maven.plugins",
-			"maven-dependency-plugin", "2.1");
+			"maven-dependency-plugin", "2.2");
 		Element groupIdElement = new Element("groupId", groupId);
 		Element artifactIdElement = new Element("artifactId", artifactId);
 		Element versionElement = new Element("version", version);

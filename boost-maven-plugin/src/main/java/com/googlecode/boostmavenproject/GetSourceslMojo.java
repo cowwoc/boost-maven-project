@@ -10,22 +10,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -55,7 +51,7 @@ public class GetSourceslMojo
 	 * @component
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
-	private PluginManager pluginManager;
+	private BuildPluginManager pluginManager;
 	/**
 	 * The local maven repository.
 	 *
@@ -65,10 +61,6 @@ public class GetSourceslMojo
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
 	private ArtifactRepository localRepository;
-	/**
-	 * @component
-	 */
-	private ArtifactResolver artifactResolver;
 	/**
 	 * @component
 	 */
@@ -133,7 +125,7 @@ public class GetSourceslMojo
 	}
 
 	/**
-	 * Returns an artifact.
+	 * Returns a local artifact.
 	 *
 	 * @param groupId the artifact group id
 	 * @param artifactId the artifact id
@@ -148,18 +140,9 @@ public class GetSourceslMojo
 	{
 		Artifact artifact = artifactFactory.createArtifactWithClassifier(groupId, artifactId, version,
 			"zip", classifier);
-		try
-		{
-			artifactResolver.resolve(artifact, Collections.emptyList(), localRepository);
-		}
-		catch (ArtifactResolutionException e)
-		{
-			throw new MojoExecutionException("", e);
-		}
-		catch (ArtifactNotFoundException e)
-		{
+		artifact.setFile(new File(localRepository.getBasedir(), localRepository.pathOf(artifact)));
+		if (!artifact.getFile().exists())
 			return null;
-		}
 
 		Log log = getLog();
 		if (log.isDebugEnabled())

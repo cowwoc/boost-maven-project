@@ -5,10 +5,9 @@
 	<parent>
 		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.45.0-SNAPSHOT</version>
+		<version>1.46.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>boost-maven-plugin</artifactId>
-	<version>0.1-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 	<name>Boost Maven Plugin</name>
 	<description>Boost Maven Plugin</description>
@@ -36,7 +35,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>${maven.compiler.plugin.version}</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
@@ -46,7 +45,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.4.3</version>
+				<version>${maven.resources.plugin.version}</version>
 				<configuration>
 					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
@@ -57,45 +56,50 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
-			<version>2.2.1</version>
+			<version>${maven.plugin.api.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
 			<artifactId>annotations</artifactId>
-			<version>1.3.9</version>
+			<version>${findbugs.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.google.collections</groupId>
-			<artifactId>google-collections</artifactId>
-			<version>1.0</version>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-project</artifactId>
-			<version>2.2.1</version>
+			<version>${maven.project.version}</version>
 		</dependency>
-	 <dependency>
-	  <groupId>org.apache.maven.plugins</groupId>
-	  <artifactId>maven-dependency-plugin</artifactId>
-	  <version>2.1</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>org.apache.maven.plugins</groupId>
-	  <artifactId>maven-install-plugin</artifactId>
-	  <version>2.3.1</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>org.apache.maven</groupId>
-	  <artifactId>maven-artifact</artifactId>
-	  <version>2.2.1</version>
-	 </dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-dependency-plugin</artifactId>
+			<version>${maven.dependency.plugin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-install-plugin</artifactId>
+			<version>${maven.install.plugin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-artifact</artifactId>
+			<version>${maven.artifact.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-core</artifactId>
+			<version>${maven.core.version}</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

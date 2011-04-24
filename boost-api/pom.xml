@@ -5,11 +5,9 @@
 	<parent>
 		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.45.0-SNAPSHOT</version>
+		<version>1.46.1-SNAPSHOT</version>
 	</parent>
-	<groupId>com.googlecode.boost-maven-project</groupId>
 	<artifactId>boost-api</artifactId>
-	<packaging>jar</packaging>
 	<name>Boost API</name>
 	<description>Boost API Module</description>
 	<url>http://code.google.com/p/boost-maven-project/</url>
@@ -35,7 +33,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.1</version>
+				<version>${maven.dependency.plugin.version}</version>
 				<executions>
 					<execution>
 						<goals>
@@ -60,7 +58,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
+				<version>${maven.jar.plugin.version}</version>
 				<configuration>
 					<classesDirectory>${project.build.directory}/dependency/boost</classesDirectory>
 					<includes>
@@ -70,7 +68,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-install-plugin</artifactId>
-				<version>2.3.1</version>
+				<version>${maven.install.plugin.version}</version>
 			</plugin>
 		</plugins>
 	</build>
