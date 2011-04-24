@@ -114,9 +114,12 @@ public class GenerateBinariesMojo
 			exec(new ProcessBuilder("bootstrap").directory(outputDirectoryFile));
 			Runtime runtime = Runtime.getRuntime();
 
+			// --hash prevents the output path from exceeding the 255-character filesystem limit
+			// REFERENCE: https://svn.boost.org/trac/boost/ticket/5155
 			LinkedList<String> commandLine = Lists.newLinkedList(Lists.newArrayList("bjam",
 				"toolset=msvc", "address-model=" + addressModel, "--stagedir=stage" + addressModel,
-				"--build-type=complete", "stage", "-j", String.valueOf(runtime.availableProcessors())));
+				"--build-type=complete", "stage", "-j", String.valueOf(runtime.availableProcessors()),
+				"--hash"));
 			if (System.getProperty("os.name").contains("Windows"))
 				commandLine.addAll(0, ImmutableList.of("cmd.exe", "/c"));
 			exec(new ProcessBuilder(commandLine).directory(outputDirectoryFile));

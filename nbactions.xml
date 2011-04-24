@@ -111,7 +111,7 @@
                 <goal>release:perform</goal>
             </goals>
             <activatedProfiles>
-                <activatedProfile>windows-vs10-amd64,</activatedProfile>
+                <activatedProfile>windows-vs10-amd64</activatedProfile>
                 <activatedProfile>sonatype-oss-release</activatedProfile>
             </activatedProfiles>
         </action>
