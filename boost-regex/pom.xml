@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.46.1-SNAPSHOT</version>
+		<version>1.46.1</version>
 	</parent>
 	<artifactId>boost-regex</artifactId>
 	<name>Boost Regex</name>
