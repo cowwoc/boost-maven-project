@@ -2,8 +2,6 @@ package com.googlecode.boostmavenproject;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.googlecode.boostmavenproject.MojoExecutor.Element;
-import com.googlecode.boostmavenproject.MojoExecutor.ExecutionEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +17,9 @@ import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.twdata.maven.mojoexecutor.MojoExecutor;
+import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
+import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
 /**
  * Compiles the Boost C++ library and installs it into the local Maven repository.

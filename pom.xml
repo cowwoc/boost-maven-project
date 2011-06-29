@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>com.googlecode.boost-maven-project</groupId>
 	<artifactId>boost</artifactId>
-	<version>1.46.1-SNAPSHOT</version>
+	<version>1.46.1-b1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Boost</name>
 	<description>Boost Module</description>
@@ -52,36 +52,18 @@
 	</modules>
 	<profiles>
 		<profile>
-			<id>windows-vs10-i386</id>
+			<id>windows-i386-vs10</id>
 			<properties>
-				<cmake.generator>Visual Studio 10</cmake.generator>
 				<addressModel>32</addressModel>
-				<classifier>windows-vs10-i386</classifier>
+				<classifier>windows-i386-vs10</classifier>
 			</properties>
 		</profile>
 		<profile>
-			<id>windows-vs10-amd64</id>
+			<id>windows-amd64-vs10</id>
 			<properties>
-				<cmake.generator>Visual Studio 10</cmake.generator>
 				<addressModel>64</addressModel>
-				<classifier>windows-vs10-amd64</classifier>
+				<classifier>windows-amd64-vs10</classifier>
 			</properties>
 		</profile>
 	</profiles>
-	<properties>
-		<maven.dependency.plugin.version>2.2</maven.dependency.plugin.version>
-		<maven.jar.plugin.version>2.3.1</maven.jar.plugin.version>
-		<maven.install.plugin.version>2.3.1</maven.install.plugin.version>
-		<maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
-		<maven.resources.plugin.version>2.5</maven.resources.plugin.version>
-		<maven.plugin.api.version>3.0.3</maven.plugin.api.version>
-		<maven.project.version>2.2.1</maven.project.version>
-		<maven.artifact.version>2.2.1</maven.artifact.version>
-		<maven.core.version>3.0.3</maven.core.version>
-		<junit.version>4.8.2</junit.version>
-		<findbugs.version>1.3.9</findbugs.version>
-		<guava.version>r09</guava.version>
-		<boost.release.version>1.46.1</boost.release.version>
-		<maven.deploy.plugin.version>2.5</maven.deploy.plugin.version>
-	</properties>
 </project>

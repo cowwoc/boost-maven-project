@@ -1,7 +1,5 @@
 package com.googlecode.boostmavenproject;
 
-import com.googlecode.boostmavenproject.MojoExecutor.Element;
-import com.googlecode.boostmavenproject.MojoExecutor.ExecutionEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -25,6 +23,9 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.twdata.maven.mojoexecutor.MojoExecutor;
+import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
+import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
 /**
  * Downloads and installs the Boost C++ library sources into the local Maven
@@ -34,7 +35,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @phase generate-sources
  * @author Gili Tzabari
  */
-public class GetSourceslMojo
+public class GetSourcesMojo
 	extends AbstractMojo
 {
 	/**
