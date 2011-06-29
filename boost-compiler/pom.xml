@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.46.1-b1-SNAPSHOT</version>
+		<version>1.46.1-b1</version>
 	</parent>
 	<artifactId>boost-compiler</artifactId>
 	<name>Boost Compiler</name>
