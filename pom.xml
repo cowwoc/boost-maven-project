@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>com.googlecode.boost-maven-project</groupId>
 	<artifactId>boost</artifactId>
-	<version>1.46.1-b2-SNAPSHOT</version>
+	<version>1.47.0-b1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Boost</name>
 	<description>Boost Module</description>
@@ -35,6 +35,7 @@
 		<module>boost-maven-plugin</module>
 		<module>boost-compiler</module>
 		<module>boost-api</module>
+		<module>boost-chrono</module>
 		<module>boost-date-time</module>
 		<module>boost-filesystem</module>
 		<module>boost-graph</module>

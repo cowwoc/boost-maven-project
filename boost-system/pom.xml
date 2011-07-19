@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.46.1-b2-SNAPSHOT</version>
+		<version>1.47.0-b1-SNAPSHOT</version>
 	</parent>
 	<artifactId>boost-system</artifactId>
 	<name>Boost System</name>
@@ -32,7 +32,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.2</version>
+				<version>2.3</version>
 				<executions>
 					<execution>
 						<goals>

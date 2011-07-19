@@ -6,9 +6,9 @@
 		<artifactId>boost</artifactId>
 		<version>1.47.0-b1-SNAPSHOT</version>
 	</parent>
-	<artifactId>boost-api</artifactId>
-	<name>Boost API</name>
-	<description>Boost API Module</description>
+	<artifactId>boost-chrono</artifactId>
+	<name>Boost Chrono</name>
+	<description>Useful time utilities.</description>
 	<url>http://code.google.com/p/boost-maven-project/</url>
 	<licenses>
 		<license>
@@ -47,7 +47,7 @@
 									<version>${project.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<includes>boost/**</includes>
+									<includes>stage${addressModel}/lib/*boost_chrono*</includes>
 									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
 								</artifactItem>
 							</artifactItems>
@@ -59,9 +59,10 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.1</version>
 				<configuration>
-					<classesDirectory>${project.build.directory}/dependency/boost</classesDirectory>
+					<classifier>${classifier}</classifier>
+					<classesDirectory>${project.build.directory}/dependency/boost/stage${addressModel}</classesDirectory>
 					<includes>
-						<include>boost/**</include>
+						<include>lib/**</include>
 					</includes>
 				</configuration>
 			</plugin>
