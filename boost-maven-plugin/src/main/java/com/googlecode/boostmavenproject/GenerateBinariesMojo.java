@@ -6,14 +6,13 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-
 import java.util.List;
 import java.util.Map.Entry;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -98,8 +97,8 @@ public class GenerateBinariesMojo
 		try
 		{
 			File outputDirectoryFile = new File(outputDirectory);
-			File markerFile = new File(project.getBasedir(),
-				"target/dependency-maven-plugin-markers/" + groupId + "-" + artifactId
+			File markerFile = new File(project.getBuild().getDirectory(),
+				"dependency-maven-plugin-markers/" + groupId + "-" + artifactId
 				+ "-zip-" + classifier + "-" + version + ".marker");
 			boolean boostAlreadyUnpacked = markerFile.exists();
 			unpack(groupId, artifactId, version, classifier, outputDirectoryFile);

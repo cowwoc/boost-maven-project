@@ -1,27 +1,22 @@
 package com.googlecode.boostmavenproject;
 
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-
 import java.net.URL;
 import java.util.List;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.twdata.maven.mojoexecutor.MojoExecutor;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
@@ -65,7 +60,7 @@ public class GetSourcesMojo
 	/**
 	 * @component
 	 */
-	private ArtifactFactory artifactFactory;
+	private RepositorySystem repositorySystem;
 	/**
 	 * @parameter expression="${project}"
 	 * @required
@@ -139,7 +134,7 @@ public class GetSourcesMojo
 															 String classifier)
 		throws MojoExecutionException
 	{
-		Artifact artifact = artifactFactory.createArtifactWithClassifier(groupId, artifactId, version,
+		Artifact artifact = repositorySystem.createArtifactWithClassifier(groupId, artifactId, version,
 			"zip", classifier);
 		artifact.setFile(new File(localRepository.getBasedir(), localRepository.pathOf(artifact)));
 		if (!artifact.getFile().exists())
