@@ -6,15 +6,15 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-
 import java.util.List;
 import java.util.Map.Entry;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.twdata.maven.mojoexecutor.MojoExecutor;
@@ -26,19 +26,21 @@ import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
  *
  * @goal generate-binaries
  * @phase compile
+ *
  * @author Gili Tzabari
  */
 public class GenerateBinariesMojo
 	extends AbstractMojo
 {
 	/**
-	 * The library version.
+	 * The release platform.
 	 *
-	 * @parameter
+	 * @parameter expression="${classifier}"
 	 * @required
+	 * @readonly
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
-	private String version;
+	private String classifier;
 	/**
 	 * The path to copy the binaries into.
 	 *
@@ -48,17 +50,8 @@ public class GenerateBinariesMojo
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
 	private String outputDirectory;
 	/**
-	 * Indicates whether to build 32-bit or 64-bit binaries.
-	 * Acceptable values include: 32 or 64
-	 *
-	 * @parameter
-	 * @required
-	 */
-	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
-	private String addressModel;
-	/**
 	 * Extra arguments to pass to the build process.
-	 * 
+	 *
 	 * @parameter
 	 */
 	private List<String> arguments;
@@ -92,12 +85,19 @@ public class GenerateBinariesMojo
 	{
 		final String groupId = "com.googlecode.boost-maven-project";
 		final String artifactId = "boost-sources";
-		final String classifier = "sources";
-		if (!addressModel.equals("32") && !addressModel.equals("64"))
-			throw new MojoExecutionException("Invalid addressModel value: " + addressModel);
+		String addressModel;
+		if (classifier.contains("-i386-"))
+			addressModel = "32";
+		else if (classifier.contains("-amd64"))
+			addressModel = "64";
+		else
+			throw new MojoExecutionException("Unexpected classifier: " + classifier);
 		try
 		{
 			File outputDirectoryFile = new File(outputDirectory);
+			PluginDescriptor pluginDescriptor = (PluginDescriptor) getPluginContext().
+				get("pluginDescriptor");
+			String version = GetSourcesMojo.getBoostVersion(pluginDescriptor.getVersion());
 			File markerFile = new File(project.getBasedir(),
 				"target/dependency-maven-plugin-markers/" + groupId + "-" + artifactId
 				+ "-zip-" + classifier + "-" + version + ".marker");
@@ -141,7 +141,7 @@ public class GenerateBinariesMojo
 		throws MojoExecutionException
 	{
 		Plugin execPlugin = MojoExecutor.plugin("org.codehaus.mojo",
-			"exec-maven-plugin", "1.2");
+			"exec-maven-plugin", "1.2.1");
 		Element executableElement = new Element("executable", process.command().get(0));
 
 		List<Element> argumentsList = Lists.newArrayList();
@@ -163,7 +163,15 @@ public class GenerateBinariesMojo
 		Element argumentsElement = new Element("arguments", argumentsList.toArray(new Element[0]));
 		List<Element> environmentVariables = Lists.newArrayList();
 		for (Entry<String, String> entry: process.environment().entrySet())
-			environmentVariables.add(new Element(entry.getKey(), entry.getValue()));
+		{
+			// Skip empty values.
+
+			//
+			// WORKAROUND: http://jira.codehaus.org/browse/MNG-5248
+			String value = entry.getValue();
+			if (!value.isEmpty())
+				environmentVariables.add(new Element(entry.getKey(), entry.getValue()));
+		}
 		Element environmentVariablesElement = new Element("environmentVariables", environmentVariables.
 			toArray(new Element[0]));
 
@@ -239,11 +247,11 @@ public class GenerateBinariesMojo
 		throws MojoExecutionException
 	{
 		Plugin unpackPlugin = MojoExecutor.plugin("org.apache.maven.plugins",
-			"maven-dependency-plugin", "2.2");
+			"maven-dependency-plugin", "2.4");
 		Element groupIdElement = new Element("groupId", groupId);
 		Element artifactIdElement = new Element("artifactId", artifactId);
 		Element versionElement = new Element("version", version);
-		Element packagingElement = new Element("type", "zip");
+		Element packagingElement = new Element("type", "jar");
 		Element outputDirectoryElement = new Element("outputDirectory",
 			outputDirectory.getAbsolutePath());
 		List<Element> elements = Lists.newArrayList(groupIdElement, artifactIdElement, versionElement,
