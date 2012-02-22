@@ -1,11 +1,17 @@
 package com.googlecode.boostmavenproject;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterators;
+import de.schlichtherle.truezip.fs.FsSyncOptions;
+import de.schlichtherle.truezip.nio.file.TPath;
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Iterator;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
@@ -13,7 +19,8 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
@@ -27,20 +34,21 @@ import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
  * repository.
  *
  * @goal get-sources
- * @phase generate-sources
+ * @phase generate-resources
  * @author Gili Tzabari
  */
 public class GetSourcesMojo
 	extends AbstractMojo
 {
 	/**
-	 * The library version.
+	 * The release platform.
 	 *
-	 * @parameter
+	 * @parameter expression="${classifier}"
 	 * @required
+	 * @readonly
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
-	private String version;
+	private String classifier;
 	/**
 	 * The maven plugin manager.
 	 *
@@ -79,45 +87,63 @@ public class GetSourcesMojo
 	@Override
 	@SuppressWarnings("NP_UNWRITTEN_FIELD")
 	public void execute()
-		throws MojoExecutionException, MojoFailureException
+		throws MojoExecutionException
 	{
 		final String groupId = "com.googlecode.boost-maven-project";
 		final String artifactId = "boost-sources";
+		PluginDescriptor pluginDescriptor = (PluginDescriptor) getPluginContext().
+			get("pluginDescriptor");
+		String version = getBoostVersion(pluginDescriptor.getVersion());
 		Artifact artifact = getArtifact(groupId, artifactId, version, "sources");
+		if (artifact != null)
+			return;
+		String extension;
+		if (classifier.startsWith("windows-"))
+			extension = "zip";
+		else if (classifier.startsWith("linux-") || classifier.startsWith("mac-"))
+			extension = "tar.gz";
+		else
+			throw new MojoExecutionException("Unexpected classifier: " + classifier);
 
-		File file;
+		Path file;
 		try
 		{
 			file = download(new URL("http://sourceforge.net/projects/boost/files/boost/" + version
 															+ "/boost_" + version.replace('.', '_')
-															+ ".zip?use_mirror=autoselect"), artifact);
-			if (file == null)
-				return;
+															+ "." + extension + "?use_mirror=autoselect"), artifact);
 		}
 		catch (MalformedURLException e)
 		{
-			throw new MojoFailureException("", e);
-		}
-		catch (IOException e)
-		{
-			throw new MojoFailureException("", e);
+			throw new MojoExecutionException("", e);
 		}
 		Plugin installPlugin = MojoExecutor.plugin("org.apache.maven.plugins",
 			"maven-install-plugin", "2.3.1");
-		Element fileElement = new Element("file", file.getAbsolutePath());
+		Element fileElement = new Element("file", file.toAbsolutePath().toString());
 		Element groupIdElement = new Element("groupId", groupId);
 		Element artifactIdElement = new Element("artifactId", artifactId);
 		Element versionElement = new Element("version", version);
-		Element classifierElement = new Element("classifier", "sources");
-		Element packagingElement = new Element("packaging", "zip");
+		Element classifierElement = new Element("classifier", classifier);
+		Element packagingElement = new Element("packaging", "jar");
 		Xpp3Dom configuration = MojoExecutor.configuration(fileElement, groupIdElement,
 			artifactIdElement, versionElement, classifierElement, packagingElement);
 		ExecutionEnvironment environment = MojoExecutor.executionEnvironment(project, session,
 			pluginManager);
 		MojoExecutor.executeMojo(installPlugin, "install-file", configuration, environment);
-		Log log = getLog();
-		if (file.exists() && !file.delete() && log.isWarnEnabled())
-			log.warn("Cannot delete " + file.getAbsolutePath());
+	}
+
+	/**
+	 * Converts the plugin version to the Boost version.
+	 *
+	 * @param pluginVersion the plugin version
+	 * @return the boost version
+	 * @throws MojoExecutionException if pluginVersion cannot be parsed
+	 */
+	static String getBoostVersion(String pluginVersion) throws MojoExecutionException
+	{
+		int index = pluginVersion.indexOf('-');
+		if (index == -1)
+			throw new MojoExecutionException("Unexpected version: " + pluginVersion);
+		return pluginVersion.substring(0, index);
 	}
 
 	/**
@@ -135,7 +161,7 @@ public class GetSourcesMojo
 		throws MojoExecutionException
 	{
 		Artifact artifact = repositorySystem.createArtifactWithClassifier(groupId, artifactId, version,
-			"zip", classifier);
+			"jar", classifier);
 		artifact.setFile(new File(localRepository.getBasedir(), localRepository.pathOf(artifact)));
 		if (!artifact.getFile().exists())
 			return null;
@@ -154,67 +180,123 @@ public class GetSourcesMojo
 	 * @return the downloaded File or null if the artifact is already up-to-date
 	 * @throws MojoExecutionException if an error occurs downloading the file
 	 */
-	private File download(URL url, Artifact artifact) throws MojoExecutionException
+	private Path download(URL url, Artifact artifact) throws MojoExecutionException
 	{
 		Log log = getLog();
 		if (log.isInfoEnabled())
 			log.info("Downloading: " + url.toString());
-		File result;
+		String filename = new File(url.getPath()).getName();
+		Path result = Paths.get(project.getBuild().getDirectory(), filename);
 		try
 		{
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-			if (artifact != null)
-			{
-				List<String> contentLengths = connection.getHeaderFields().get("Content-Length");
-				if (contentLengths != null)
-				{
-					long downloadSize = Long.parseLong(contentLengths.get(0));
-					long artifactSize = artifact.getFile().length();
-					if (log.isDebugEnabled())
-						log.debug("downloadSize=" + downloadSize + ", artifactSize=" + artifactSize);
-					if (artifactSize == downloadSize)
-					{
-						if (log.isDebugEnabled())
-							log.debug("Artifact already up-to-date");
-						return null;
-					}
-				}
-			}
-			try
-			{
-				BufferedInputStream in = new BufferedInputStream(connection.getInputStream());
-				result = File.createTempFile("boost", "zip");
-				if (log.isDebugEnabled())
-					log.debug("tempFile: " + result.getAbsolutePath());
-				BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(
-					result));
-				byte[] buffer = new byte[10 * 1024];
-				try
-				{
-					while (true)
-					{
-						int count = in.read(buffer);
-						if (count == -1)
-							break;
-						out.write(buffer, 0, count);
-					}
-				}
-				finally
-				{
-					in.close();
-					out.close();
-				}
-				return result;
-			}
-			finally
-			{
-				connection.disconnect();
-			}
+//			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//
+//			try
+//			{
+//				BufferedInputStream in = new BufferedInputStream(connection.getInputStream());
+//
+//				Files.createDirectories(Paths.get(project.getBuild().getDirectory()));
+//				BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(result));
+//				byte[] buffer = new byte[10 * 1024];
+//				try
+//				{
+//					while (true)
+//					{
+//						int count = in.read(buffer);
+//						if (count == -1)
+//							break;
+//						out.write(buffer, 0, count);
+//					}
+//				}
+//				finally
+//				{
+//					in.close();
+//					out.close();
+//				}
+//			}
+//			finally
+//			{
+//				connection.disconnect();
+//			}
+			return convertToJar(result);
 		}
 		catch (IOException e)
 		{
 			throw new MojoExecutionException("", e);
 		}
+	}
+
+	/**
+	 * Converts a compressed file to JAR format, removing the top-level directory at the same
+	 * time.
+	 *
+	 * @param path the file to convert
+	 * @return the JAR file
+	 * @throws IOException if an I/O error occurs
+	 */
+	private Path convertToJar(Path path) throws IOException
+	{
+		final TPath sourceFile = new TPath(path);
+		String filename = path.getFileName().toString();
+		String extension = getFileExtension(filename);
+		String nameWithoutExtension = filename.substring(0, filename.length() - extension.length());
+		String nextExtension = getFileExtension(nameWithoutExtension);
+		if (!nextExtension.isEmpty())
+		{
+			if (nextExtension.equals(".tar"))
+			{
+				// BUG: http://java.net/jira/browse/TRUEZIP-219
+				Iterator<Path> files = Files.newDirectoryStream(sourceFile).iterator();
+				Path tarFile;
+				try
+				{
+					tarFile = Iterators.getOnlyElement(files);
+				}
+				catch (IllegalArgumentException e)
+				{
+					throw new IOException("File contained multiple TAR files: " + path, e);
+				}
+				System.out.println("tarFile: " + tarFile);
+				return convertToJar(tarFile);
+			}
+			else
+				throw new IllegalArgumentException("Unsupported extension: " + path);
+		}
+		Path result = Paths.get(project.getBuild().getDirectory(), nameWithoutExtension + ".jar");
+		Files.deleteIfExists(result);
+		final TPath targetFile = new TPath(result);
+
+		Files.walkFileTree(sourceFile, new SimpleFileVisitor<Path>()
+		{
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
+			{
+				Files.copy(file, targetFile.resolve(sourceFile.relativize(file)),
+					StandardCopyOption.COPY_ATTRIBUTES);
+				return super.visitFile(file, attrs);
+			}
+		});
+		targetFile.getFileSystem().sync(FsSyncOptions.UMOUNT);
+		return result;
+	}
+
+	/**
+	 * Returns a filename extension. For example, {@code getFileExtension("foo.tar.gz")} returns
+	 * {@code .gz}
+	 *
+	 * @param filename the filename
+	 * @return an empty string if no extension is found
+	 * @throws NullArgumentException if filename is null
+	 */
+	private String getFileExtension(String filename)
+	{
+		Preconditions.checkNotNull(filename, "filename may not be null");
+
+		int index = filename.lastIndexOf('.');
+
+		// Unix-style ".hidden" files have no extension
+		if (index <= 0)
+			return "";
+		return filename.substring(index);
 	}
 }

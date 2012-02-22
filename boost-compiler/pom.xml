@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.47.0-b2-SNAPSHOT</version>
+		<version>1.48.0-b1-SNAPSHOT</version>
 	</parent>
 	<artifactId>boost-compiler</artifactId>
 	<name>Boost Compiler</name>
@@ -40,9 +40,6 @@
 						<goals>
 							<goal>get-sources</goal>
 						</goals>
-						<configuration>
-							<version>${boost.release.version}</version>
-						</configuration>
 					</execution>
 					<execution>
 						<id>boost-compile</id>
@@ -87,6 +84,5 @@
 	</build>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<boost.release.version>1.47.0</boost.release.version>
 	</properties>
 </project>
