@@ -5,20 +5,23 @@ import com.google.common.collect.Iterators;
 import de.schlichtherle.truezip.fs.FsSyncOptions;
 import de.schlichtherle.truezip.nio.file.TPath;
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Iterator;
+import org.apache.commons.lang.NullArgumentException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
@@ -43,12 +46,12 @@ public class GetSourcesMojo
 	/**
 	 * The release platform.
 	 *
-	 * @parameter expression="${classifier}"
+	 * @parameter expression="${boost.classifier}"
 	 * @required
 	 * @readonly
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
-	private String classifier;
+	private String boostClassifier;
 	/**
 	 * The maven plugin manager.
 	 *
@@ -94,23 +97,23 @@ public class GetSourcesMojo
 		PluginDescriptor pluginDescriptor = (PluginDescriptor) getPluginContext().
 			get("pluginDescriptor");
 		String version = getBoostVersion(pluginDescriptor.getVersion());
-		Artifact artifact = getArtifact(groupId, artifactId, version, "sources");
+		Artifact artifact = getArtifact(groupId, artifactId, version, boostClassifier);
 		if (artifact != null)
 			return;
 		String extension;
-		if (classifier.startsWith("windows-"))
+		if (boostClassifier.startsWith("windows-"))
 			extension = "zip";
-		else if (classifier.startsWith("linux-") || classifier.startsWith("mac-"))
+		else if (boostClassifier.startsWith("linux-") || boostClassifier.startsWith("mac-"))
 			extension = "tar.gz";
 		else
-			throw new MojoExecutionException("Unexpected classifier: " + classifier);
+			throw new MojoExecutionException("Unexpected boost.classifier: " + boostClassifier);
 
 		Path file;
 		try
 		{
 			file = download(new URL("http://sourceforge.net/projects/boost/files/boost/" + version
 															+ "/boost_" + version.replace('.', '_')
-															+ "." + extension + "?use_mirror=autoselect"), artifact);
+															+ "." + extension + "?use_mirror=autoselect"));
 		}
 		catch (MalformedURLException e)
 		{
@@ -122,7 +125,7 @@ public class GetSourcesMojo
 		Element groupIdElement = new Element("groupId", groupId);
 		Element artifactIdElement = new Element("artifactId", artifactId);
 		Element versionElement = new Element("version", version);
-		Element classifierElement = new Element("classifier", classifier);
+		Element classifierElement = new Element("classifier", boostClassifier);
 		Element packagingElement = new Element("packaging", "jar");
 		Xpp3Dom configuration = MojoExecutor.configuration(fileElement, groupIdElement,
 			artifactIdElement, versionElement, classifierElement, packagingElement);
@@ -180,7 +183,7 @@ public class GetSourcesMojo
 	 * @return the downloaded File or null if the artifact is already up-to-date
 	 * @throws MojoExecutionException if an error occurs downloading the file
 	 */
-	private Path download(URL url, Artifact artifact) throws MojoExecutionException
+	private Path download(URL url) throws MojoExecutionException
 	{
 		Log log = getLog();
 		if (log.isInfoEnabled())
@@ -189,35 +192,35 @@ public class GetSourcesMojo
 		Path result = Paths.get(project.getBuild().getDirectory(), filename);
 		try
 		{
-//			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//
-//			try
-//			{
-//				BufferedInputStream in = new BufferedInputStream(connection.getInputStream());
-//
-//				Files.createDirectories(Paths.get(project.getBuild().getDirectory()));
-//				BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(result));
-//				byte[] buffer = new byte[10 * 1024];
-//				try
-//				{
-//					while (true)
-//					{
-//						int count = in.read(buffer);
-//						if (count == -1)
-//							break;
-//						out.write(buffer, 0, count);
-//					}
-//				}
-//				finally
-//				{
-//					in.close();
-//					out.close();
-//				}
-//			}
-//			finally
-//			{
-//				connection.disconnect();
-//			}
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+			try
+			{
+				BufferedInputStream in = new BufferedInputStream(connection.getInputStream());
+
+				Files.createDirectories(Paths.get(project.getBuild().getDirectory()));
+				BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(result));
+				byte[] buffer = new byte[10 * 1024];
+				try
+				{
+					while (true)
+					{
+						int count = in.read(buffer);
+						if (count == -1)
+							break;
+						out.write(buffer, 0, count);
+					}
+				}
+				finally
+				{
+					in.close();
+					out.close();
+				}
+			}
+			finally
+			{
+				connection.disconnect();
+			}
 			return convertToJar(result);
 		}
 		catch (IOException e)
@@ -247,6 +250,10 @@ public class GetSourcesMojo
 			{
 				// BUG: http://java.net/jira/browse/TRUEZIP-219
 				Iterator<Path> files = Files.newDirectoryStream(sourceFile).iterator();
+
+				// WORKAROUND: http://java.net/jira/browse/TRUEZIP-223
+				files.hasNext();
+
 				Path tarFile;
 				try
 				{
@@ -256,7 +263,6 @@ public class GetSourcesMojo
 				{
 					throw new IOException("File contained multiple TAR files: " + path, e);
 				}
-				System.out.println("tarFile: " + tarFile);
 				return convertToJar(tarFile);
 			}
 			else
@@ -266,12 +272,28 @@ public class GetSourcesMojo
 		Files.deleteIfExists(result);
 		final TPath targetFile = new TPath(result);
 
+		// Strip top-level directory
+		final Path rootPath;
+		Iterator<Path> files = Files.newDirectoryStream(sourceFile).iterator();
+
+		// WORKAROUND: http://java.net/jira/browse/TRUEZIP-223
+		files.hasNext();
+
+		try
+		{
+			rootPath = Iterators.getOnlyElement(files);
+		}
+		catch (IllegalArgumentException e)
+		{
+			throw new IOException("File contained multiple TAR files: " + path, e);
+		}
+
 		Files.walkFileTree(sourceFile, new SimpleFileVisitor<Path>()
 		{
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
 			{
-				Files.copy(file, targetFile.resolve(sourceFile.relativize(file)),
+				Files.copy(file, targetFile.resolve(rootPath.relativize(file)),
 					StandardCopyOption.COPY_ATTRIBUTES);
 				return super.visitFile(file, attrs);
 			}

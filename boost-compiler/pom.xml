@@ -29,6 +29,7 @@
 		</developer>
 	</developers>
 	<build>
+		<directory>${basedir}/target/${boost.classifier}</directory>
 		<plugins>
 			<plugin>
 				<groupId>com.googlecode.boost-maven-project</groupId>
@@ -61,11 +62,11 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.1</version>
 				<configuration>
-					<classifier>${classifier}</classifier>
+					<classifier>${boost.classifier}</classifier>
 					<classesDirectory>${project.build.directory}/dependency</classesDirectory>
 					<includes>
 						<include>boost/**</include>
-						<include>stage${addressModel}/**</include>
+						<include>lib/**</include>
 					</includes>
 				</configuration>
 			</plugin>

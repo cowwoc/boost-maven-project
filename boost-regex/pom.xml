@@ -29,6 +29,7 @@
 		</developer>
 	</developers>
 	<build>
+		<directory>${basedir}/target/${boost.classifier}</directory>
 		<plugins>
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -43,11 +44,11 @@
 								<artifactItem>
 									<groupId>${project.groupId}</groupId>
 									<artifactId>boost-compiler</artifactId>
-									<classifier>${classifier}</classifier>
+									<classifier>${boost.classifier}</classifier>
 									<version>${project.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<includes>stage${addressModel}/lib/*boost_regex*</includes>
+									<includes>lib/*boost_regex*</includes>
 									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
 								</artifactItem>
 							</artifactItems>
@@ -59,8 +60,8 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.1</version>
 				<configuration>
-					<classifier>${classifier}</classifier>
-					<classesDirectory>${project.build.directory}/dependency/boost/stage${addressModel}</classesDirectory>
+					<classifier>${boost.classifier}</classifier>
+					<classesDirectory>${project.build.directory}/dependency/boost</classesDirectory>
 					<includes>
 						<include>lib/**</include>
 					</includes>

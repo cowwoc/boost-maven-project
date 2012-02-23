@@ -26,7 +26,6 @@ import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
  *
  * @goal generate-binaries
  * @phase compile
- *
  * @author Gili Tzabari
  */
 public class GenerateBinariesMojo
@@ -35,12 +34,12 @@ public class GenerateBinariesMojo
 	/**
 	 * The release platform.
 	 *
-	 * @parameter expression="${classifier}"
+	 * @parameter expression="${boost.classifier}"
 	 * @required
 	 * @readonly
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
-	private String classifier;
+	private String boostClassifier;
 	/**
 	 * The path to copy the binaries into.
 	 *
@@ -86,49 +85,31 @@ public class GenerateBinariesMojo
 		final String groupId = "com.googlecode.boost-maven-project";
 		final String artifactId = "boost-sources";
 		String addressModel;
-		if (classifier.contains("-i386-"))
+		if (boostClassifier.contains("-i386-"))
 			addressModel = "32";
-		else if (classifier.contains("-amd64"))
+		else if (boostClassifier.contains("-amd64"))
 			addressModel = "64";
 		else
-			throw new MojoExecutionException("Unexpected classifier: " + classifier);
-		try
-		{
-			File outputDirectoryFile = new File(outputDirectory);
-			PluginDescriptor pluginDescriptor = (PluginDescriptor) getPluginContext().
-				get("pluginDescriptor");
-			String version = GetSourcesMojo.getBoostVersion(pluginDescriptor.getVersion());
-			File markerFile = new File(project.getBuild().getDirectory(),
-				"dependency-maven-plugin-markers/" + groupId + "-" + artifactId
-				+ "-zip-" + classifier + "-" + version + ".marker");
-			boolean boostAlreadyUnpacked = markerFile.exists();
-			unpack(groupId, artifactId, version, classifier, outputDirectoryFile);
+			throw new MojoExecutionException("Unexpected boost.classifier: " + boostClassifier);
+		File outputDirectoryFile = new File(outputDirectory);
+		PluginDescriptor pluginDescriptor = (PluginDescriptor) getPluginContext().
+			get("pluginDescriptor");
+		String version = GetSourcesMojo.getBoostVersion(pluginDescriptor.getVersion());
+		unpack(groupId, artifactId, version, boostClassifier, outputDirectoryFile);
 
-			// Strip top-level directory
-			if (!boostAlreadyUnpacked)
-			{
-				move(new File(outputDirectoryFile, "boost_" + version.replace('.', '_')),
-					outputDirectoryFile);
-			}
+		// Build boost
+		exec(new ProcessBuilder("bootstrap").directory(outputDirectoryFile));
+		Runtime runtime = Runtime.getRuntime();
 
-			// Build boost
-			exec(new ProcessBuilder("bootstrap").directory(outputDirectoryFile));
-			Runtime runtime = Runtime.getRuntime();
-
-			// --hash prevents the output path from exceeding the 255-character filesystem limit
-			// REFERENCE: https://svn.boost.org/trac/boost/ticket/5155
-			LinkedList<String> commandLine = Lists.newLinkedList(Lists.newArrayList("bjam",
-				"toolset=msvc", "address-model=" + addressModel, "--stagedir=stage" + addressModel,
-				"--build-type=complete", "stage", "-j", String.valueOf(runtime.availableProcessors()),
-				"--hash"));
-			if (System.getProperty("os.name").contains("Windows"))
-				commandLine.addAll(0, ImmutableList.of("cmd.exe", "/c"));
-			exec(new ProcessBuilder(commandLine).directory(outputDirectoryFile));
-		}
-		catch (IOException e)
-		{
-			throw new MojoExecutionException("", e);
-		}
+		// --hash prevents the output path from exceeding the 255-character filesystem limit
+		// REFERENCE: https://svn.boost.org/trac/boost/ticket/5155
+		LinkedList<String> commandLine = Lists.newLinkedList(Lists.newArrayList("bjam",
+			"toolset=msvc", "address-model=" + addressModel, "--stagedir=.",
+			"--build-type=complete", "stage", "-j", String.valueOf(runtime.availableProcessors()),
+			"--hash"));
+		if (System.getProperty("os.name").contains("Windows"))
+			commandLine.addAll(0, ImmutableList.of("cmd.exe", "/c"));
+		exec(new ProcessBuilder(commandLine).directory(outputDirectoryFile));
 	}
 
 	/**

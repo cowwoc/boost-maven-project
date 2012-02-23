@@ -56,28 +56,28 @@
 			<id>windows-i386-vs10</id>
 			<properties>
 				<addressModel>32</addressModel>
-				<classifier>windows-i386-vs10</classifier>
+				<boost.classifier>windows-i386-vs10</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>windows-amd64-vs10</id>
 			<properties>
 				<addressModel>64</addressModel>
-				<classifier>windows-amd64-vs10</classifier>
+				<boost.classifier>windows-amd64-vs10</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>linux-i386-gmake</id>
 			<properties>
 				<addressModel>32</addressModel>
-				<classifier>linux-i386-gmake</classifier>
+				<boost.classifier>linux-i386-gmake</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>linux-amd64-gmake</id>
 			<properties>
 				<addressModel>64</addressModel>
-				<classifier>linux-amd64-gmake</classifier>
+				<boost.classifier>linux-amd64-gmake</boost.classifier>
 			</properties>
 		</profile>
 	</profiles>
