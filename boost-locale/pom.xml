@@ -6,9 +6,9 @@
 		<artifactId>boost</artifactId>
 		<version>1.49.0-b1-SNAPSHOT</version>
 	</parent>
-	<artifactId>boost-compiler</artifactId>
-	<name>Boost Compiler</name>
-	<description>Boost compiler</description>
+	<artifactId>boost-locale</artifactId>
+	<name>Boost Locale</name>
+	<description>Provide localization and Unicode handling tools for C++.</description>
 	<url>http://code.google.com/p/boost-maven-project/</url>
 	<licenses>
 		<license>
@@ -32,15 +32,27 @@
 		<directory>${basedir}/target/${boost.classifier}</directory>
 		<plugins>
 			<plugin>
-				<groupId>com.googlecode.boost-maven-project</groupId>
-				<artifactId>boost-maven-plugin</artifactId>
-				<version>${project.version}</version>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.4</version>
 				<executions>
 					<execution>
-						<id>boost-compile</id>
 						<goals>
-							<goal>generate-binaries</goal>
+							<goal>unpack</goal>
 						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>boost-compiler</artifactId>
+									<classifier>${boost.classifier}</classifier>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<includes>lib/*boost_locale*</includes>
+									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -51,7 +63,6 @@
 					<classifier>${boost.classifier}</classifier>
 					<classesDirectory>${project.build.directory}/dependency/boost</classesDirectory>
 					<includes>
-						<include>boost/**</include>
 						<include>lib/**</include>
 					</includes>
 				</configuration>
@@ -59,13 +70,6 @@
 			<plugin>
 				<artifactId>maven-install-plugin</artifactId>
 				<version>2.3.1</version>
-			</plugin>
-			<plugin>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>

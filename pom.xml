@@ -40,6 +40,7 @@
 		<module>boost-filesystem</module>
 		<module>boost-graph</module>
 		<module>boost-iostreams</module>
+		<module>boost-locale</module>
 		<module>boost-math</module>
 		<module>boost-program-options</module>
 		<module>boost-random</module>
