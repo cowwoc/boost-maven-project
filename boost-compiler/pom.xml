@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.48.0-b1-SNAPSHOT</version>
+		<version>1.49.0-b1-SNAPSHOT</version>
 	</parent>
 	<artifactId>boost-compiler</artifactId>
 	<name>Boost Compiler</name>
@@ -37,24 +37,10 @@
 				<version>${project.version}</version>
 				<executions>
 					<execution>
-						<id>boost-sources</id>
-						<goals>
-							<goal>get-sources</goal>
-						</goals>
-					</execution>
-					<execution>
 						<id>boost-compile</id>
 						<goals>
 							<goal>generate-binaries</goal>
 						</goals>
-						<configuration>
-							<version>${boost.release.version}</version>
-							<outputDirectory>${project.build.directory}/dependency</outputDirectory>
-							<addressModel>${addressModel}</addressModel>
-							<arguments>
-								<argument>--without-python</argument>
-							</arguments>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.48.0-b1-SNAPSHOT</version>
+		<version>1.49.0-b1-SNAPSHOT</version>
 	</parent>
 	<artifactId>boost-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
@@ -104,26 +104,17 @@
 			<artifactId>mojo-executor</artifactId>
 			<version>2.0</version>
 		</dependency>
-	 <dependency>
-	  <groupId>de.schlichtherle.truezip</groupId>
-	  <artifactId>truezip-driver-zip</artifactId>
-	  <version>7.4.3</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>de.schlichtherle.truezip</groupId>
-	  <artifactId>truezip-path</artifactId>
-	  <version>7.4.3</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>org.codehaus.mojo</groupId>
-	  <artifactId>exec-maven-plugin</artifactId>
-	  <version>1.2.1</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>de.schlichtherle.truezip</groupId>
-	  <artifactId>truezip-driver-tar</artifactId>
-	  <version>7.4.3</version>
-	 </dependency>
+		<dependency>
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>exec-maven-plugin</artifactId>
+			<version>1.2.1</version>
+		</dependency>
+		<dependency>
+			<artifactId>commons-compress</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<type>jar</type>
+			<version>1.4-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
