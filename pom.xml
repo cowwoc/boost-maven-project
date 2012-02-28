@@ -54,31 +54,31 @@
 	</modules>
 	<profiles>
 		<profile>
-			<id>windows-i386-vs10</id>
+			<id>windows-i386-msvc</id>
 			<properties>
 				<addressModel>32</addressModel>
-				<boost.classifier>windows-i386-vs10</boost.classifier>
+				<boost.classifier>windows-i386-msvc</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
-			<id>windows-amd64-vs10</id>
+			<id>windows-amd64-msvc</id>
 			<properties>
 				<addressModel>64</addressModel>
-				<boost.classifier>windows-amd64-vs10</boost.classifier>
+				<boost.classifier>windows-amd64-msvc</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
-			<id>linux-i386-gmake</id>
+			<id>linux-i386-gcc</id>
 			<properties>
 				<addressModel>32</addressModel>
-				<boost.classifier>linux-i386-gmake</boost.classifier>
+				<boost.classifier>linux-i386-gcc</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
-			<id>linux-amd64-gmake</id>
+			<id>linux-amd64-gcc</id>
 			<properties>
 				<addressModel>64</addressModel>
-				<boost.classifier>linux-amd64-gmake</boost.classifier>
+				<boost.classifier>linux-amd64-gcc</boost.classifier>
 			</properties>
 		</profile>
 	</profiles>

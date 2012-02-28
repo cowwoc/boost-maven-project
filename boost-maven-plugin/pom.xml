@@ -53,12 +53,6 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-plugin-api</artifactId>
-			<version>3.0.4</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
@@ -73,31 +67,6 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>11.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-project</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-dependency-plugin</artifactId>
-			<version>2.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-install-plugin</artifactId>
-			<version>2.3.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-artifact</artifactId>
-			<version>3.0.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-core</artifactId>
-			<version>3.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.twdata.maven</groupId>
@@ -115,6 +84,16 @@
 			<type>jar</type>
 			<version>1.4-SNAPSHOT</version>
 		</dependency>
+	 <dependency>
+	  <groupId>org.apache.maven</groupId>
+	  <artifactId>maven-core</artifactId>
+	  <version>3.0.4</version>
+	 </dependency>
+	 <dependency>
+	  <groupId>org.codehaus.plexus</groupId>
+	  <artifactId>plexus-utils</artifactId>
+	  <version>3.0</version>
+	 </dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

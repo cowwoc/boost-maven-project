@@ -30,9 +30,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.lang.NullArgumentException;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
@@ -42,7 +39,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.twdata.maven.mojoexecutor.MojoExecutor;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
@@ -53,7 +49,6 @@ import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
  *
  * @goal generate-binaries
  * @phase compile
- *
  * @author Gili Tzabari
  */
 public class GenerateBinariesMojo
@@ -80,19 +75,6 @@ public class GenerateBinariesMojo
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
 	private BuildPluginManager pluginManager;
 	/**
-	 * The local maven repository.
-	 *
-	 * @parameter expression="${localRepository}"
-	 * @required
-	 * @readonly
-	 */
-	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
-	private ArtifactRepository localRepository;
-	/**
-	 * @component
-	 */
-	private RepositorySystem repositorySystem;
-	/**
 	 * @parameter expression="${project}"
 	 * @required
 	 * @readonly
@@ -115,14 +97,9 @@ public class GenerateBinariesMojo
 	public void execute()
 		throws MojoExecutionException, MojoFailureException
 	{
-		final String groupId = "com.googlecode.boost-maven-project";
-		final String artifactId = "boost-binaries";
 		PluginDescriptor pluginDescriptor = (PluginDescriptor) getPluginContext().
 			get("pluginDescriptor");
 		String version = getBoostVersion(pluginDescriptor.getVersion());
-		Artifact artifact = getArtifact(groupId, artifactId, version, boostClassifier);
-		if (artifact != null)
-			return;
 		String extension;
 		List<String> bootstrapCommand;
 
@@ -139,7 +116,7 @@ public class GenerateBinariesMojo
 		// REFERENCE: https://svn.boost.org/trac/boost/ticket/5155
 		LinkedList<String> bjamCommand = Lists.newLinkedList(Lists.newArrayList(
 			"address-model=" + addressModel, "--stagedir=.", "--without-python",
-			"--without-mpi", "--layout=versioned", "--build-type=complete", "stage", "-j", 
+			"--without-mpi", "--layout=tagged", "--build-type=complete", "stage", "-j",
 			String.valueOf(runtime.availableProcessors()), "--hash"));
 
 		if (boostClassifier.startsWith("windows-"))
@@ -160,11 +137,14 @@ public class GenerateBinariesMojo
 		Path buildPath = Paths.get(project.getBuild().getDirectory(), "dependency/boost");
 		try
 		{
-			deleteRecursively(buildPath);
 			Path result = download(new URL("http://sourceforge.net/projects/boost/files/boost/" + version
 				+ "/boost_" + version.replace('.', '_') + "." + extension + "?use_mirror=autoselect"));
-			extract(result, buildPath);
-			normalizeDirectories(buildPath);
+			if (Files.notExists(buildPath.resolve("lib")))
+			{
+				// Build process has not begun
+				extract(result, buildPath);
+				normalizeDirectories(buildPath);
+			}
 		}
 		catch (IOException e)
 		{
@@ -239,33 +219,6 @@ public class GenerateBinariesMojo
 		if (index == -1)
 			throw new MojoExecutionException("Unexpected version: " + pluginVersion);
 		return pluginVersion.substring(0, index);
-	}
-
-	/**
-	 * Returns a local artifact.
-	 *
-	 * @param groupId the artifact group id
-	 * @param artifactId the artifact id
-	 * @param version the artifact version
-	 * @param classifier the artifact classifier, empty string if there is none
-	 * @return null if the artifact is not installed
-	 * @throws MojoExecutionException if an error occurs while resolving the artifact
-	 */
-	private org.apache.maven.artifact.Artifact getArtifact(String groupId, String artifactId,
-		String version,
-		String classifier)
-		throws MojoExecutionException
-	{
-		Artifact artifact = repositorySystem.createArtifactWithClassifier(groupId, artifactId, version,
-			"jar", classifier);
-		artifact.setFile(new File(localRepository.getBasedir(), localRepository.pathOf(artifact)));
-		if (!artifact.getFile().exists())
-			return null;
-
-		Log log = getLog();
-		if (log.isDebugEnabled())
-			log.debug("Artifact already installed: " + artifact.getFile().getAbsolutePath());
-		return artifact;
 	}
 
 	/**
@@ -544,7 +497,7 @@ public class GenerateBinariesMojo
 	 *
 	 * @param filename the filename
 	 * @return an empty string if no extension is found
-	 * @throws NullArgumentException if filename is null
+	 * @throws NullPointerException if filename is null
 	 */
 	private String getFileExtension(String filename)
 	{
@@ -566,8 +519,7 @@ public class GenerateBinariesMojo
 	private void normalizeDirectories(final Path source) throws IOException
 	{
 		// Strip top-level directory
-		final Path topDirectory = Iterators.getOnlyElement(Files.newDirectoryStream(source).
-			iterator());
+		final Path topDirectory = Iterators.getOnlyElement(Files.newDirectoryStream(source).iterator());
 		Files.walkFileTree(topDirectory, new SimpleFileVisitor<Path>()
 		{
 			@Override

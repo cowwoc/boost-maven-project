@@ -52,7 +52,15 @@
 					<classesDirectory>${project.build.directory}/dependency/boost</classesDirectory>
 					<includes>
 						<include>boost/**</include>
-						<include>lib/**</include>
+
+						<!-- Windows -->
+						<include>lib/*.dll</include>
+						<include>lib/*.lib</include>
+						<include>lib/*.pdb</include>
+
+						<!-- Linux: JAR files don't support symlinks so we omit them -->
+						<include>lib/*.a</include>
+						<include>lib/*.so</include>
 					</includes>
 				</configuration>
 			</plugin>
