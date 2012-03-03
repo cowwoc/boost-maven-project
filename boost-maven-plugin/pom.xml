@@ -10,25 +10,6 @@
 	<packaging>maven-plugin</packaging>
 	<name>Boost Maven Plugin</name>
 	<description>Boost Maven Plugin</description>
-	<url>http://code.google.com/p/boost-maven-project/</url>
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-	<scm>
-		<url>https://boost-maven-project.googlecode.com/hg/</url>
-		<connection>scm:hg:https://boost-maven-project.googlecode.com/hg/</connection>
-		<developerConnection>scm:hg:https://boost-maven-project.googlecode.com/hg/</developerConnection>
-	</scm>
-	<developers>
-		<developer>
-			<id>cowwoc</id>
-			<name>Gili Tzabari</name>
-		</developer>
-	</developers>
 	<build>
 		<plugins>
 			<plugin>
@@ -84,43 +65,18 @@
 			<type>jar</type>
 			<version>1.4-SNAPSHOT</version>
 		</dependency>
-	 <dependency>
-	  <groupId>org.apache.maven</groupId>
-	  <artifactId>maven-core</artifactId>
-	  <version>3.0.4</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>org.codehaus.plexus</groupId>
-	  <artifactId>plexus-utils</artifactId>
-	  <version>3.0</version>
-	 </dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-core</artifactId>
+			<version>3.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<version>3.0</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-	<profiles>
-		<profile>
-			<id>sonatype-oss-release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<passphrase>${gpg.passphrase}</passphrase>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>

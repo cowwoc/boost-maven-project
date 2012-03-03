@@ -9,25 +9,6 @@
 	<artifactId>boost-filesystem</artifactId>
 	<name>Boost Filesystem</name>
 	<description>The Boost Filesystem Library provides portable facilities to query and manipulate paths, files, and directories.</description>
-	<url>http://code.google.com/p/boost-maven-project/</url>
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-	<scm>
-		<url>https://boost-maven-project.googlecode.com/hg/</url>
-		<connection>scm:hg:https://boost-maven-project.googlecode.com/hg/</connection>
-		<developerConnection>scm:hg:https://boost-maven-project.googlecode.com/hg/</developerConnection>
-	</scm>
-	<developers>
-		<developer>
-			<id>cowwoc</id>
-			<name>Gili Tzabari</name>
-		</developer>
-	</developers>
 	<build>
 		<directory>${basedir}/target/${boost.classifier}</directory>
 		<plugins>
