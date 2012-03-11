@@ -18,11 +18,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -91,6 +88,7 @@ public class GenerateBinariesMojo
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
 	private MavenSession session;
+	private final boolean isPosix = !System.getProperty("os.name").toLowerCase().startsWith("windows");
 
 	@Override
 	@SuppressWarnings("NP_UNWRITTEN_FIELD")
@@ -106,8 +104,16 @@ public class GenerateBinariesMojo
 		String addressModel;
 		if (boostClassifier.contains("-i386-"))
 			addressModel = "32";
-		else if (boostClassifier.contains("-amd64"))
+		else if (boostClassifier.contains("-amd64-"))
 			addressModel = "64";
+		else
+			throw new MojoExecutionException("Unexpected boost.classifier: " + boostClassifier);
+		
+		String buildMode;
+		if (boostClassifier.contains("-debug"))
+			buildMode = "debug";
+		else if (boostClassifier.contains("-release"))
+			buildMode = "release";
 		else
 			throw new MojoExecutionException("Unexpected boost.classifier: " + boostClassifier);
 		Runtime runtime = Runtime.getRuntime();
@@ -116,8 +122,9 @@ public class GenerateBinariesMojo
 		// REFERENCE: https://svn.boost.org/trac/boost/ticket/5155
 		LinkedList<String> bjamCommand = Lists.newLinkedList(Lists.newArrayList(
 			"address-model=" + addressModel, "--stagedir=.", "--without-python",
-			"--without-mpi", "--layout=tagged", "--build-type=complete", "stage", "-j",
-			String.valueOf(runtime.availableProcessors()), "--hash"));
+			"--without-mpi", "--layout=system", "variant=" + buildMode, "link=shared", "threading=multi",
+			"runtime-link=shared", "stage", "-j", String.valueOf(runtime.availableProcessors()), 
+			"--hash"));
 
 		if (boostClassifier.startsWith("windows-"))
 		{
@@ -337,23 +344,58 @@ public class GenerateBinariesMojo
 	private void extractZip(Path source, Path target) throws IOException
 	{
 		ZipFile zipFile = new ZipFile(source.toFile());
+		ByteBuffer buffer = ByteBuffer.allocate(10 * 1024);
 		try
 		{
-			final byte[] buffer = new byte[10 * 1024];
 			Enumeration<ZipArchiveEntry> entries = zipFile.getEntriesInPhysicalOrder();
 			while (entries.hasMoreElements())
 			{
 				ZipArchiveEntry entry = entries.nextElement();
-				try (InputStream in = zipFile.getInputStream(entry))
+				List<FileAttribute<?>> attributes = new ArrayList<>();
+				if (isPosix)
 				{
-					try (OutputStream out = Files.newOutputStream(target.resolve(entry.getName())))
+					attributes.add(PosixFilePermissions.asFileAttribute(getPosixPermissions(
+						entry.getUnixMode())));
+				}
+				if (entry.isDirectory())
+				{
+					Path directory = target.resolve(entry.getName());
+					Files.createDirectories(directory);
+
+					if (isPosix)
 					{
-						while (true)
+						Files.setPosixFilePermissions(directory, 
+							(Set<PosixFilePermission>) attributes.get(0).value());
+					}
+					continue;
+				}
+				try (ReadableByteChannel reader = Channels.newChannel(zipFile.getInputStream(entry)))
+				{
+					Path targetFile = target.resolve(entry.getName());
+
+					// Omitted directories are created using the default permissions
+					Files.createDirectories(targetFile.getParent());
+
+					try (SeekableByteChannel out = Files.newByteChannel(targetFile,
+							ImmutableSet.of(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+							StandardOpenOption.WRITE), attributes.toArray(new FileAttribute[0])))
+					{
+						long bytesLeft = entry.getSize();
+						while (bytesLeft > 0)
 						{
-							int count = in.read(buffer);
+							if (bytesLeft < buffer.limit())
+								buffer.limit((int) bytesLeft);
+							int count = reader.read(buffer);
 							if (count == -1)
 								break;
-							out.write(buffer, 0, count);
+							buffer.flip();
+							do
+							{
+								out.write(buffer);
+							}
+							while (buffer.hasRemaining());
+							buffer.clear();
+							bytesLeft -= count;
 						}
 					}
 				}
@@ -382,14 +424,22 @@ public class GenerateBinariesMojo
 				TarArchiveEntry entry = in.getNextTarEntry();
 				if (entry == null)
 					break;
-				FileAttribute<Set<PosixFilePermission>> attribute =
-					PosixFilePermissions.asFileAttribute(getPosixPermissions(entry.getMode()));
+				List<FileAttribute<?>> attributes = new ArrayList<>();
+				if (isPosix)
+				{
+					attributes.add(PosixFilePermissions.asFileAttribute(getPosixPermissions(
+						entry.getMode())));
+				}
 				if (entry.isDirectory())
 				{
 					Path directory = target.resolve(entry.getName());
 					Files.createDirectories(directory);
 
-					Files.setPosixFilePermissions(directory, attribute.value());
+					if (isPosix)
+					{
+						Files.setPosixFilePermissions(directory, 
+							(Set<PosixFilePermission>) attributes.get(0).value());
+					}
 					continue;
 				}
 				ReadableByteChannel reader = Channels.newChannel(in);
@@ -400,7 +450,7 @@ public class GenerateBinariesMojo
 
 				try (SeekableByteChannel out = Files.newByteChannel(targetFile,
 						ImmutableSet.of(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
-						StandardOpenOption.WRITE), attribute))
+						StandardOpenOption.WRITE), attributes.toArray(new FileAttribute[0])))
 				{
 					long bytesLeft = entry.getSize();
 					while (bytesLeft > 0)
