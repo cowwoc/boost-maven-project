@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.googlecode.boost-maven-project</groupId>
 	<artifactId>boost</artifactId>
-	<version>1.49.0-b2-SNAPSHOT</version>
+	<version>1.52.0-b1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Boost</name>
 	<description>Boost Module</description>
@@ -39,6 +39,7 @@
 		<module>boost-compiler</module>
 		<module>boost-api</module>
 		<module>boost-chrono</module>
+		<module>boost-context</module>
 		<module>boost-date-time</module>
 		<module>boost-filesystem</module>
 		<module>boost-graph</module>
@@ -55,6 +56,35 @@
 		<module>boost-thread</module>
 		<module>boost-wave</module>
 	</modules>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
+		</plugins>
+	</build>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 	<profiles>
 		<profile>
 			<id>windows-i386-msvc-debug</id>

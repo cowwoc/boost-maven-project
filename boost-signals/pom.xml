@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.49.0-b2-SNAPSHOT</version>
+		<version>1.52.0-b1-SNAPSHOT</version>
 	</parent>
 	<artifactId>boost-signals</artifactId>
 	<name>Boost Signals</name>
@@ -14,7 +14,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.4</version>
+				<version>2.6</version>
 				<executions>
 					<execution>
 						<goals>
@@ -39,7 +39,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
+				<version>2.4</version>
 				<configuration>
 					<classifier>${boost.classifier}</classifier>
 					<classesDirectory>${project.build.directory}/dependency/boost</classesDirectory>
@@ -48,13 +48,6 @@
 					</includes>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-install-plugin</artifactId>
-				<version>2.3.1</version>
-			</plugin>
 		</plugins>
 	</build>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
 </project>

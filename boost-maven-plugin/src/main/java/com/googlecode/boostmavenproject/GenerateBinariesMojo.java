@@ -2,31 +2,27 @@ package com.googlecode.boostmavenproject;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.*;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
-import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipFile;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
@@ -35,7 +31,12 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.archiver.ArchiverException;
+import org.codehaus.plexus.archiver.UnArchiver;
+import org.codehaus.plexus.archiver.manager.ArchiverManager;
+import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.twdata.maven.mojoexecutor.MojoExecutor;
 import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
@@ -51,6 +52,20 @@ import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 public class GenerateBinariesMojo
 	extends AbstractMojo
 {
+	/**
+	 * Converts the plugin version to the Boost version.
+	 *
+	 * @param pluginVersion the plugin version
+	 * @return the boost version
+	 * @throws MojoExecutionException if pluginVersion cannot be parsed
+	 */
+	static String getBoostVersion(String pluginVersion) throws MojoExecutionException
+	{
+		int index = pluginVersion.indexOf('-');
+		if (index == -1)
+			throw new MojoExecutionException("Unexpected version: " + pluginVersion);
+		return pluginVersion.substring(0, index);
+	}
 	/**
 	 * The release platform.
 	 *
@@ -77,7 +92,7 @@ public class GenerateBinariesMojo
 	 * @readonly
 	 */
 	@SuppressWarnings(
-	{
+		{
 		"UWF_UNWRITTEN_FIELD", "NP_UNWRITTEN_FIELD"
 	})
 	private MavenProject project;
@@ -88,7 +103,14 @@ public class GenerateBinariesMojo
 	 */
 	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
 	private MavenSession session;
-	private final boolean isPosix = !System.getProperty("os.name").toLowerCase().startsWith("windows");
+	/**
+	 * To look up Archiver/UnArchiver implementations.
+	 *
+	 * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
+	 * @required
+	 */
+	@Component
+	private ArchiverManager archiverManager;
 
 	@Override
 	@SuppressWarnings("NP_UNWRITTEN_FIELD")
@@ -108,7 +130,7 @@ public class GenerateBinariesMojo
 			addressModel = "64";
 		else
 			throw new MojoExecutionException("Unexpected boost.classifier: " + boostClassifier);
-		
+
 		String buildMode;
 		if (boostClassifier.contains("-debug"))
 			buildMode = "debug";
@@ -123,7 +145,7 @@ public class GenerateBinariesMojo
 		LinkedList<String> bjamCommand = Lists.newLinkedList(Lists.newArrayList(
 			"address-model=" + addressModel, "--stagedir=.", "--without-python",
 			"--without-mpi", "--layout=system", "variant=" + buildMode, "link=shared", "threading=multi",
-			"runtime-link=shared", "stage", "-j", String.valueOf(runtime.availableProcessors()), 
+			"runtime-link=shared", "stage", "-j", String.valueOf(runtime.availableProcessors()),
 			"--hash"));
 
 		if (boostClassifier.startsWith("windows-"))
@@ -148,8 +170,33 @@ public class GenerateBinariesMojo
 				+ "/boost_" + version.replace('.', '_') + "." + extension + "?use_mirror=autoselect"));
 			if (Files.notExists(buildPath.resolve("lib")))
 			{
+				Files.createDirectories(buildPath);
 				// Build process has not begun
-				extract(result, buildPath);
+				try
+				{
+					// Based on AbstractDependencyMojo.java in maven-dependency-plugin revision 1403449
+					UnArchiver unArchiver;
+					try
+					{
+						unArchiver = archiverManager.getUnArchiver(result.toFile());
+						getLog().debug("Found unArchiver by type: " + unArchiver);
+					}
+					catch (NoSuchArchiverException e)
+					{
+						getLog().debug("Unknown archiver type", e);
+						return;
+					}
+
+					unArchiver.setUseJvmChmod(true);
+					unArchiver.setSourceFile(result.toFile());
+					unArchiver.setDestDirectory(buildPath.toFile());
+					unArchiver.extract();
+				}
+				catch (ArchiverException e)
+				{
+					throw new MojoExecutionException("Error unpacking file: " + result + " to: " + buildPath
+						+ "\r\n" + e.toString(), e);
+				}
 				normalizeDirectories(buildPath);
 			}
 		}
@@ -178,11 +225,11 @@ public class GenerateBinariesMojo
 
 		List<Element> argumentsList = Lists.newArrayList();
 		List<String> command = process.command();
-		for (String entry: command.subList(1, command.size()))
+		for (String entry : command.subList(1, command.size()))
 			argumentsList.add(new Element("argument", entry));
 		if (arguments != null)
 		{
-			for (String entry: arguments)
+			for (String entry : arguments)
 				argumentsList.add(new Element("argument", entry));
 		}
 
@@ -192,9 +239,10 @@ public class GenerateBinariesMojo
 		Element workingDirectoryElement = new Element("workingDirectory", workingDirectory.
 			getAbsolutePath());
 
-		Element argumentsElement = new Element("arguments", argumentsList.toArray(new Element[0]));
+		Element argumentsElement = new Element("arguments", argumentsList.toArray(
+			new Element[argumentsList.size()]));
 		List<Element> environmentVariables = Lists.newArrayList();
-		for (Entry<String, String> entry: process.environment().entrySet())
+		for (Entry<String, String> entry : process.environment().entrySet())
 		{
 			// Skip empty values.
 			//
@@ -204,28 +252,13 @@ public class GenerateBinariesMojo
 				environmentVariables.add(new Element(entry.getKey(), entry.getValue()));
 		}
 		Element environmentVariablesElement = new Element("environmentVariables", environmentVariables.
-			toArray(new Element[0]));
+			toArray(new Element[environmentVariables.size()]));
 
 		Xpp3Dom configuration = MojoExecutor.configuration(executableElement, workingDirectoryElement,
 			argumentsElement, environmentVariablesElement);
 		ExecutionEnvironment environment = MojoExecutor.executionEnvironment(project, session,
 			pluginManager);
 		MojoExecutor.executeMojo(execPlugin, "exec", configuration, environment);
-	}
-
-	/**
-	 * Converts the plugin version to the Boost version.
-	 *
-	 * @param pluginVersion the plugin version
-	 * @return the boost version
-	 * @throws MojoExecutionException if pluginVersion cannot be parsed
-	 */
-	static String getBoostVersion(String pluginVersion) throws MojoExecutionException
-	{
-		int index = pluginVersion.indexOf('-');
-		if (index == -1)
-			throw new MojoExecutionException("Unexpected version: " + pluginVersion);
-		return pluginVersion.substring(0, index);
 	}
 
 	/**
@@ -285,263 +318,6 @@ public class GenerateBinariesMojo
 	}
 
 	/**
-	 * Extracts the contents of an archive.
-	 *
-	 * @param source the file to extract
-	 * @param target the directory to extract to
-	 * @throws IOException if an I/O error occurs
-	 */
-	private void extract(Path source, Path target) throws IOException
-	{
-		Files.createDirectories(target);
-		String filename = source.getFileName().toString();
-		String extension = getFileExtension(filename);
-		String nameWithoutExtension = filename.substring(0, filename.length() - extension.length());
-		String nextExtension = getFileExtension(nameWithoutExtension);
-		switch (extension)
-		{
-			case ".zip":
-			{
-				if (!nextExtension.isEmpty())
-					throw new UnsupportedOperationException("Unsupported file type: " + source);
-
-				extractZip(source, target);
-				break;
-			}
-			case ".gz":
-			{
-				if (!nextExtension.isEmpty())
-				{
-					Path outputDir = Files.createTempDirectory("cmake");
-					Path result = extractGzip(source, outputDir);
-					extract(result, target);
-					Files.deleteIfExists(result);
-					Files.deleteIfExists(outputDir);
-				}
-				else
-					extractGzip(source, target);
-				break;
-			}
-			case ".tar":
-			{
-				if (!nextExtension.isEmpty())
-					throw new UnsupportedOperationException("Unsupported file type: " + source);
-				extractTar(source, target);
-				break;
-			}
-			default:
-				throw new UnsupportedOperationException("Unsupported file type: " + source);
-		}
-	}
-
-	/**
-	 * Extracts a zip file.
-	 *
-	 * @param source the source file
-	 * @param target the target directory
-	 * @throws IOException if an I/O error occurs
-	 */
-	private void extractZip(Path source, Path target) throws IOException
-	{
-		ZipFile zipFile = new ZipFile(source.toFile());
-		ByteBuffer buffer = ByteBuffer.allocate(10 * 1024);
-		try
-		{
-			Enumeration<ZipArchiveEntry> entries = zipFile.getEntriesInPhysicalOrder();
-			while (entries.hasMoreElements())
-			{
-				ZipArchiveEntry entry = entries.nextElement();
-				List<FileAttribute<?>> attributes = new ArrayList<>();
-				if (isPosix)
-				{
-					attributes.add(PosixFilePermissions.asFileAttribute(getPosixPermissions(
-						entry.getUnixMode())));
-				}
-				if (entry.isDirectory())
-				{
-					Path directory = target.resolve(entry.getName());
-					Files.createDirectories(directory);
-
-					if (isPosix)
-					{
-						Files.setPosixFilePermissions(directory, 
-							(Set<PosixFilePermission>) attributes.get(0).value());
-					}
-					continue;
-				}
-				try (ReadableByteChannel reader = Channels.newChannel(zipFile.getInputStream(entry)))
-				{
-					Path targetFile = target.resolve(entry.getName());
-
-					// Omitted directories are created using the default permissions
-					Files.createDirectories(targetFile.getParent());
-
-					try (SeekableByteChannel out = Files.newByteChannel(targetFile,
-							ImmutableSet.of(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
-							StandardOpenOption.WRITE), attributes.toArray(new FileAttribute[0])))
-					{
-						long bytesLeft = entry.getSize();
-						while (bytesLeft > 0)
-						{
-							if (bytesLeft < buffer.limit())
-								buffer.limit((int) bytesLeft);
-							int count = reader.read(buffer);
-							if (count == -1)
-								break;
-							buffer.flip();
-							do
-							{
-								out.write(buffer);
-							}
-							while (buffer.hasRemaining());
-							buffer.clear();
-							bytesLeft -= count;
-						}
-					}
-				}
-			}
-		}
-		finally
-		{
-			zipFile.close();
-		}
-	}
-
-	/**
-	 * Extracts a tar file.
-	 *
-	 * @param source the source file
-	 * @param target the target directory
-	 * @throws IOException if an I/O error occurs
-	 */
-	private void extractTar(Path source, Path target) throws IOException
-	{
-		ByteBuffer buffer = ByteBuffer.allocate(10 * 1024);
-		try (TarArchiveInputStream in = new TarArchiveInputStream(Files.newInputStream(source)))
-		{
-			while (true)
-			{
-				TarArchiveEntry entry = in.getNextTarEntry();
-				if (entry == null)
-					break;
-				List<FileAttribute<?>> attributes = new ArrayList<>();
-				if (isPosix)
-				{
-					attributes.add(PosixFilePermissions.asFileAttribute(getPosixPermissions(
-						entry.getMode())));
-				}
-				if (entry.isDirectory())
-				{
-					Path directory = target.resolve(entry.getName());
-					Files.createDirectories(directory);
-
-					if (isPosix)
-					{
-						Files.setPosixFilePermissions(directory, 
-							(Set<PosixFilePermission>) attributes.get(0).value());
-					}
-					continue;
-				}
-				ReadableByteChannel reader = Channels.newChannel(in);
-				Path targetFile = target.resolve(entry.getName());
-
-				// Omitted directories are created using the default permissions
-				Files.createDirectories(targetFile.getParent());
-
-				try (SeekableByteChannel out = Files.newByteChannel(targetFile,
-						ImmutableSet.of(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
-						StandardOpenOption.WRITE), attributes.toArray(new FileAttribute[0])))
-				{
-					long bytesLeft = entry.getSize();
-					while (bytesLeft > 0)
-					{
-						if (bytesLeft < buffer.limit())
-							buffer.limit((int) bytesLeft);
-						int count = reader.read(buffer);
-						if (count == -1)
-							break;
-						buffer.flip();
-						do
-						{
-							out.write(buffer);
-						}
-						while (buffer.hasRemaining());
-						buffer.clear();
-						bytesLeft -= count;
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Converts an integer mode to a set of PosixFilePermissions.
-	 *
-	 * @param mode the integer mode
-	 * @return the PosixFilePermissions
-	 * @see http://stackoverflow.com/a/9445853/14731
-	 */
-	private Set<PosixFilePermission> getPosixPermissions(int mode)
-	{
-		StringBuilder result = new StringBuilder(9);
-
-		// Extract digits from left to right
-		//
-		// REFERENCE: http://stackoverflow.com/questions/203854/how-to-get-the-nth-digit-of-an-integer-with-bit-wise-operations
-		for (int i = 3; i >= 1; --i)
-		{
-			// Octal is base-8
-			mode %= Math.pow(8, i);
-			int digit = (int) (mode / Math.pow(8, i - 1));
-			if ((digit & 0b0000_0100) != 0)
-				result.append("r");
-			else
-				result.append("-");
-			if ((digit & 0b0000_0010) != 0)
-				result.append("w");
-			else
-				result.append("-");
-			if ((digit & 0b0000_0001) != 0)
-				result.append("x");
-			else
-				result.append("-");
-		}
-		return PosixFilePermissions.fromString(result.toString());
-	}
-
-	/**
-	 * Extracts a Gzip file.
-	 *
-	 * @param source the source file
-	 * @param target the target directory
-	 * @return the output file
-	 * @throws IOException if an I/O error occurs
-	 */
-	private Path extractGzip(Path source, Path target) throws IOException
-	{
-		String filename = source.getFileName().toString();
-		String extension = getFileExtension(filename);
-		String nameWithoutExtension = filename.substring(0, filename.length() - extension.length());
-		Path outPath = target.resolve(nameWithoutExtension);
-		try (GzipCompressorInputStream in = new GzipCompressorInputStream(Files.newInputStream(
-				source)))
-		{
-			try (OutputStream out = Files.newOutputStream(outPath))
-			{
-				final byte[] buffer = new byte[10 * 1024];
-				while (true)
-				{
-					int count = in.read(buffer);
-					if (count == -1)
-						break;
-					out.write(buffer, 0, count);
-				}
-			}
-		}
-		return outPath;
-	}
-
-	/**
 	 * Returns a filename extension. For example, {@code getFileExtension("foo.tar.gz")} returns
 	 * {@code .gz}. Unix hidden files (e.g. ".hidden") have no extension.
 	 *
@@ -592,37 +368,5 @@ public class GenerateBinariesMojo
 			}
 		});
 		Files.deleteIfExists(topDirectory);
-	}
-
-	/**
-	 * Deletes a path recursively.
-	 *
-	 * @param path the path to delete
-	 * @throws IOException if an I/O error occurs
-	 */
-	private void deleteRecursively(Path path) throws IOException
-	{
-		// This method is vulnerable to race-conditions but it's the best we can do.
-		//
-		// BUG: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7148952
-		if (Files.notExists(path))
-			return;
-		Files.walkFileTree(path, new SimpleFileVisitor<Path>()
-		{
-			@Override
-			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
-			{
-				Files.deleteIfExists(file);
-				return super.visitFile(file, attrs);
-			}
-
-			@Override
-			public FileVisitResult postVisitDirectory(Path dir, IOException t) throws IOException
-			{
-				if (t == null)
-					Files.deleteIfExists(dir);
-				return super.postVisitDirectory(dir, t);
-			}
-		});
 	}
 }

@@ -1,1 +1,2 @@
-glob:boost-maven-plugin/nbactions-sonatype-oss-release.xml
+syntax: glob
+target
