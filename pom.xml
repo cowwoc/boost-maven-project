@@ -135,6 +135,30 @@
 			</properties>
 		</profile>
 		<profile>
+			<id>mac-i386-gcc-debug</id>
+			<properties>
+				<boost.classifier>mac-i386-gcc-debug</boost.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>mac-i386-gcc-release</id>
+			<properties>
+				<boost.classifier>mac-i386-gcc-release</boost.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>mac-amd64-gcc-debug</id>
+			<properties>
+				<boost.classifier>mac-amd64-gcc-debug</boost.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>mac-amd64-gcc-release</id>
+			<properties>
+				<boost.classifier>mac-amd64-gcc-release</boost.classifier>
+			</properties>
+		</profile>
+		<profile>
 			<id>sonatype-oss-release</id>
 			<build>
 				<plugins>
