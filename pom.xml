@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<prerequisites>
-		<maven>2.2.0</maven>
+		<maven>2.2.1</maven>
 	</prerequisites>
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.googlecode.boost-maven-project</groupId>
 	<artifactId>boost</artifactId>
-	<version>1.52.0-b1-SNAPSHOT</version>
+	<version>1.53.0-b1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Boost</name>
 	<description>Boost Module</description>
@@ -38,6 +38,7 @@
 		<module>boost-maven-plugin</module>
 		<module>boost-compiler</module>
 		<module>boost-api</module>
+		<module>boost-atomic</module>
 		<module>boost-chrono</module>
 		<module>boost-context</module>
 		<module>boost-date-time</module>

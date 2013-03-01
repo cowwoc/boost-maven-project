@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.52.0-b1-SNAPSHOT</version>
+		<version>1.53.0-b1-SNAPSHOT</version>
 	</parent>
 	<artifactId>boost-date-time</artifactId>
 	<name>Boost Date Time</name>

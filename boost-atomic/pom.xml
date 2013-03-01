@@ -6,22 +6,34 @@
 		<artifactId>boost</artifactId>
 		<version>1.53.0-b1-SNAPSHOT</version>
 	</parent>
-	<artifactId>boost-compiler</artifactId>
-	<name>Boost Compiler</name>
-	<description>Boost compiler</description>
+	<artifactId>boost-atomic</artifactId>
+	<name>Boost Atomic</name>
+	<description>C++11-style atomic&lt;&gt;.</description>
 	<build>
 		<directory>${basedir}/target/${boost.classifier}</directory>
 		<plugins>
 			<plugin>
-				<groupId>com.googlecode.boost-maven-project</groupId>
-				<artifactId>boost-maven-plugin</artifactId>
-				<version>${project.version}</version>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.6</version>
 				<executions>
 					<execution>
-						<id>boost-compile</id>
 						<goals>
-							<goal>generate-binaries</goal>
+							<goal>unpack</goal>
 						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>boost-compiler</artifactId>
+									<classifier>${boost.classifier}</classifier>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<includes>lib/*boost_atomic*</includes>
+									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -32,24 +44,8 @@
 					<classifier>${boost.classifier}</classifier>
 					<classesDirectory>${project.build.directory}/dependency/boost</classesDirectory>
 					<includes>
-						<include>boost/**</include>
-
-						<!-- Windows -->
-						<include>lib/*.dll</include>
-						<include>lib/*.lib</include>
-						<include>lib/*.pdb</include>
-
-						<!-- Linux: JAR files don't support symlinks so we omit them -->
-						<include>lib/*.a</include>
-						<include>lib/*.so</include>
+						<include>lib/**</include>
 					</includes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.7</version>
-				<configuration>
-					<skip>true</skip>
 				</configuration>
 			</plugin>
 		</plugins>
