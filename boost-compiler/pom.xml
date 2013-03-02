@@ -22,6 +22,9 @@
 						<goals>
 							<goal>generate-binaries</goal>
 						</goals>
+						<configuration>
+							<classifier>${boost.classifier}</classifier>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

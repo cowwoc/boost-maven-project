@@ -37,20 +37,14 @@
 			<version>3.0.5</version>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-archiver</artifactId>
-			<version>2.3</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-annotations</artifactId>
 			<version>3.2</version>
 		</dependency>
 		<dependency>
-			<artifactId>plexus-utils</artifactId>
-			<groupId>org.codehaus.plexus</groupId>
-			<type>jar</type>
-			<version>3.0.10</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.4.1</version>
 		</dependency>
 	</dependencies>
 </project>
