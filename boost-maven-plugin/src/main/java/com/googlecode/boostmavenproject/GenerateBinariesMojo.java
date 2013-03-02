@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -91,7 +91,7 @@ public class GenerateBinariesMojo
 	 * @required
 	 * @readonly
 	 */
-	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
+	@SuppressFBWarnings("UWF_UNWRITTEN_FIELD")
 	private String classifier;
 	/**
 	 * Extra arguments to pass to the build process.
@@ -102,14 +102,14 @@ public class GenerateBinariesMojo
 	/**
 	 * @component
 	 */
-	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
+	@SuppressFBWarnings("UWF_UNWRITTEN_FIELD")
 	private BuildPluginManager pluginManager;
 	/**
 	 * @parameter expression="${project}"
 	 * @required
 	 * @readonly
 	 */
-	@SuppressWarnings(
+	@SuppressFBWarnings(
 		{
 		"UWF_UNWRITTEN_FIELD", "NP_UNWRITTEN_FIELD"
 	})
@@ -119,11 +119,11 @@ public class GenerateBinariesMojo
 	 * @required
 	 * @readonly
 	 */
-	@SuppressWarnings("UWF_UNWRITTEN_FIELD")
+	@SuppressFBWarnings("UWF_UNWRITTEN_FIELD")
 	private MavenSession session;
 
 	@Override
-	@SuppressWarnings("NP_UNWRITTEN_FIELD")
+	@SuppressFBWarnings("NP_UNWRITTEN_FIELD")
 	public void execute()
 		throws MojoExecutionException, MojoFailureException
 	{
@@ -367,8 +367,11 @@ public class GenerateBinariesMojo
 					Files.createDirectories(directory);
 
 					if (attributes.length > 0)
-						Files.setPosixFilePermissions(directory, (Set<PosixFilePermission>) attributes[0].
-							value());
+					{
+						@SuppressWarnings("unchecked")
+						Set<PosixFilePermission> temp = (Set<PosixFilePermission>) attributes[0].value();
+						Files.setPosixFilePermissions(directory, temp);
+					}
 					continue;
 				}
 				ReadableByteChannel reader = Channels.newChannel(in);

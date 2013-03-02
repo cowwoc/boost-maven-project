@@ -10,6 +10,20 @@
 	<packaging>maven-plugin</packaging>
 	<name>Boost Maven Plugin</name>
 	<description>Boost Maven Plugin</description>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<compilerArguments>
+						<Xlint:unchecked/>
+					</compilerArguments>
+				</configuration>
+			</plugin>		
+		</plugins>
+	</build>
 	<dependencies>
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
