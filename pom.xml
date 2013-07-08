@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.googlecode.boost-maven-project</groupId>
 	<artifactId>boost</artifactId>
-	<version>1.54.0-b1-SNAPSHOT</version>
+	<version>1.53.0-b2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Boost</name>
 	<description>Boost Module</description>
@@ -46,7 +46,7 @@
 		<module>boost-graph</module>
 		<module>boost-iostreams</module>
 		<module>boost-locale</module>
-		<module>boost-log</module>
+		<!--<module>boost-log</module>-->
 		<module>boost-math</module>
 		<module>boost-program-options</module>
 		<module>boost-random</module>
