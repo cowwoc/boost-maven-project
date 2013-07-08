@@ -4,10 +4,10 @@
 	<parent>
 		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.53.0-b2-SNAPSHOT</version>
+		<version>1.54.0-b1-SNAPSHOT</version>
 	</parent>
-	<artifactId>boost-signals</artifactId>
-	<name>Boost Signals</name>
+	<artifactId>boost-signals2</artifactId>
+	<name>Boost Signals2</name>
 	<description>Managed signals &amp; slots callback implementation.</description>
 	<build>
 		<directory>${basedir}/target/${boost.classifier}</directory>
@@ -29,7 +29,7 @@
 									<version>${project.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<includes>lib/*boost_signals*</includes>
+									<includes>lib/*boost_signals2*</includes>
 									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
 								</artifactItem>
 							</artifactItems>

@@ -6,9 +6,9 @@
 		<artifactId>boost</artifactId>
 		<version>1.54.0-b1-SNAPSHOT</version>
 	</parent>
-	<artifactId>boost-regex</artifactId>
-	<name>Boost Regex</name>
-	<description>Regular expression library.</description>
+	<artifactId>boost-log</artifactId>
+	<name>Boost Log</name>
+	<description>Logging library.</description>
 	<build>
 		<directory>${basedir}/target/${boost.classifier}</directory>
 		<plugins>
@@ -29,7 +29,7 @@
 									<version>${project.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<includes>lib/*boost_regex*</includes>
+									<includes>lib/*boost_log*</includes>
 									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
 								</artifactItem>
 							</artifactItems>
