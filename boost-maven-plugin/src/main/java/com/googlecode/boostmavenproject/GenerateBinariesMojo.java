@@ -111,8 +111,8 @@ public class GenerateBinariesMojo
 	 */
 	@SuppressFBWarnings(
 		{
-		"UWF_UNWRITTEN_FIELD", "NP_UNWRITTEN_FIELD"
-	})
+			"UWF_UNWRITTEN_FIELD", "NP_UNWRITTEN_FIELD"
+		})
 	private MavenProject project;
 	/**
 	 * @parameter expression="${session}"
@@ -162,7 +162,7 @@ public class GenerateBinariesMojo
 		{
 			extension = "zip";
 			bootstrapCommand = ImmutableList.of("cmd.exe", "/c", "bootstrap.bat");
-			bjamCommand.addAll(0, ImmutableList.of("cmd.exe", "/c", "bjam"));
+			bjamCommand.addAll(0, ImmutableList.of("cmd.exe", "/c", "b2"));
 		}
 		else if (classifier.startsWith("linux-") || classifier.startsWith("mac-"))
 		{
@@ -213,11 +213,11 @@ public class GenerateBinariesMojo
 
 		List<Element> argumentsList = Lists.newArrayList();
 		List<String> command = process.command();
-		for (String entry : command.subList(1, command.size()))
+		for (String entry: command.subList(1, command.size()))
 			argumentsList.add(new Element("argument", entry));
 		if (arguments != null)
 		{
-			for (String entry : arguments)
+			for (String entry: arguments)
 				argumentsList.add(new Element("argument", entry));
 		}
 
@@ -230,7 +230,7 @@ public class GenerateBinariesMojo
 		Element argumentsElement = new Element("arguments", argumentsList.toArray(
 			new Element[argumentsList.size()]));
 		List<Element> environmentVariables = Lists.newArrayList();
-		for (Entry<String, String> entry : process.environment().entrySet())
+		for (Entry<String, String> entry: process.environment().entrySet())
 		{
 			// Skip empty values.
 			//

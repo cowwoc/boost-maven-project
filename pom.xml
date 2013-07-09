@@ -40,7 +40,11 @@
 		<module>boost-api</module>
 		<module>boost-atomic</module>
 		<module>boost-chrono</module>
-		<module>boost-context</module>
+		<!--
+		boost-context fails to build under OSX using version 1.53.0. Version 1.54.0 seems to work,
+		but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+		-->
+		<!--<module>boost-context</module>-->
 		<module>boost-date-time</module>
 		<module>boost-filesystem</module>
 		<module>boost-graph</module>
