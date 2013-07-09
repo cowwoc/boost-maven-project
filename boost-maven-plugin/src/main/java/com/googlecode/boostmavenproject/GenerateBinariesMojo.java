@@ -152,11 +152,14 @@ public class GenerateBinariesMojo
 
 		// --hash prevents the output path from exceeding the 255-character filesystem limit
 		// REFERENCE: https://svn.boost.org/trac/boost/ticket/5155
+		//
+		// boost-context fails to build under OSX using version 1.53.0. Version 1.54.0 seems to work,
+		// but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
 		LinkedList<String> bjamCommand = Lists.newLinkedList(Lists.newArrayList(
 			"address-model=" + addressModel, "--stagedir=.", "--without-python",
-			"--without-mpi", "--layout=system", "variant=" + buildMode, "link=shared", "threading=multi",
-			"runtime-link=shared", "stage", "-j", String.valueOf(runtime.availableProcessors()),
-			"--hash"));
+			"--without-mpi", "--without-context", "--layout=system",
+			"variant=" + buildMode, "link=shared", "threading=multi", "runtime-link=shared", "stage", "-j",
+			String.valueOf(runtime.availableProcessors()), "--hash"));
 
 		if (classifier.startsWith("windows-"))
 		{
