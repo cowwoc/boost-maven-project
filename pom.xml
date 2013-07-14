@@ -56,7 +56,7 @@
 		<module>boost-random</module>
 		<module>boost-regex</module>
 		<module>boost-serialization</module>
-		<module>boost-signals2</module>
+		<module>boost-signals</module>
 		<module>boost-system</module>
 		<module>boost-test</module>
 		<module>boost-thread</module>
