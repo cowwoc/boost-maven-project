@@ -1,2 +1,5 @@
 syntax: glob
 target
+pill
+deploy.bat
+release.properties
