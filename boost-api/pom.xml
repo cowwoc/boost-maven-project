@@ -48,4 +48,13 @@
 			</plugin>
 		</plugins>
 	</build>
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>boost-compiler</artifactId>
+			<version>${project.version}</version>
+			<classifier>${boost.classifier}</classifier>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 </project>
