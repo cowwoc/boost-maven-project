@@ -93,9 +93,6 @@
 				<version>2.4.1</version>
 				<executions>
 					<execution>
-						<goals>
-							<goal>prepare</goal>
-						</goals>
 						<configuration>
 							<arguments>${arguments} -Psonatype-oss-release</arguments>
 						</configuration>
