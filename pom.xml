@@ -41,8 +41,9 @@
 		<module>boost-atomic</module>
 		<module>boost-chrono</module>
 		<!--
-		boost-context fails to build under OSX using version 1.53.0. Version 1.54.0 seems to work,
-		but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+		boost-context fails to build under OSX using version 1.53.0 due to
+		http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
+		1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
 		-->
 		<!--<module>boost-context</module>-->
 		<module>boost-date-time</module>
@@ -86,23 +87,26 @@
 				<artifactId>maven-install-plugin</artifactId>
 				<version>2.4</version>
 			</plugin>
-			<plugin>
-				<!-- WORKAROUND: https://issues.sonatype.org/browse/CENTRALSRV-35 -->
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.4.1</version>
-				<executions>
-					<execution>
-						<configuration>
-							<arguments>${arguments} -Psonatype-oss-release</arguments>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<!-- WORKAROUND: https://issues.sonatype.org/browse/CENTRALSRV-35 -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.4.1</version>
+					<configuration>
+						<mavenExecutorId>forked-path</mavenExecutorId>
+						<useReleaseProfile>false</useReleaseProfile>
+						<arguments>${arguments} -Psonatype-oss-release</arguments>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<arguments />
 	</properties>
 	<profiles>
 		<profile>
