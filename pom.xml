@@ -98,7 +98,9 @@
 					<configuration>
 						<mavenExecutorId>forked-path</mavenExecutorId>
 						<useReleaseProfile>false</useReleaseProfile>
+						<autoVersionSubmodules>true</autoVersionSubmodules>
 						<arguments>${arguments} -Psonatype-oss-release</arguments>
+						<tagNameFormat>release-@{project.version}</tagNameFormat>
 					</configuration>
 				</plugin>
 			</plugins>
@@ -106,7 +108,7 @@
 	</build>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<arguments />
+		<arguments/>
 	</properties>
 	<profiles>
 		<profile>

@@ -45,6 +45,7 @@
 						<!-- Linux: JAR files don't support symlinks so we omit them -->
 						<include>lib/*.a</include>
 						<include>lib/*.so</include>
+						<include>lib/*.dylib</include>
 					</includes>
 				</configuration>
 			</plugin>
