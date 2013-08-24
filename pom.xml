@@ -24,9 +24,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<url>https://boost-maven-project.googlecode.com/hg/</url>
-		<connection>scm:hg:https://boost-maven-project.googlecode.com/hg/</connection>
-		<developerConnection>scm:hg:https://boost-maven-project.googlecode.com/hg/</developerConnection>
+		<url>https://code.google.com/p/boost-maven-project/</url>
+		<connection>scm:hg:https://code.google.com/p/boost-maven-project/</connection>
+		<developerConnection>scm:hg:https://code.google.com/p/boost-maven-project/</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 	<developers>
