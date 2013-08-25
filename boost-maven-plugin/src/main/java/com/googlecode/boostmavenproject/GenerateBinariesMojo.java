@@ -57,6 +57,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.twdata.maven.mojoexecutor.MojoExecutor;
@@ -66,10 +70,9 @@ import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 /**
  * Compiles the Boost C++ library and installs it into the local Maven repository.
  * <p/>
- * @goal generate-binaries
- * @phase compile
  * @author Gili Tzabari
  */
+@Mojo(name = "generate-binaries", defaultPhase = LifecyclePhase.COMPILE)
 public class GenerateBinariesMojo
 	extends AbstractMojo
 {
@@ -89,40 +92,26 @@ public class GenerateBinariesMojo
 	}
 	/**
 	 * The release platform.
-	 * <p/>
-	 * @parameter expression="${classifier}"
-	 * @required
-	 * @readonly
 	 */
 	@SuppressFBWarnings("UWF_UNWRITTEN_FIELD")
+	@Parameter(property = "classifier", required = true, readonly = true)
 	private String classifier;
 	/**
 	 * Extra arguments to pass to the build process.
-	 * <p/>
-	 * @parameter
 	 */
+	@Parameter
 	private List<String> arguments;
-	/**
-	 * @component
-	 */
 	@SuppressFBWarnings("UWF_UNWRITTEN_FIELD")
+	@Component
 	private BuildPluginManager pluginManager;
-	/**
-	 * @parameter expression="${project}"
-	 * @required
-	 * @readonly
-	 */
 	@SuppressFBWarnings(
 		{
 			"UWF_UNWRITTEN_FIELD", "NP_UNWRITTEN_FIELD"
 		})
+	@Parameter(property = "project", required = true, readonly = true)
 	private MavenProject project;
-	/**
-	 * @parameter expression="${session}"
-	 * @required
-	 * @readonly
-	 */
 	@SuppressFBWarnings("UWF_UNWRITTEN_FIELD")
+	@Parameter(property = "session", required = true, readonly = true)
 	private MavenSession session;
 
 	@Override
