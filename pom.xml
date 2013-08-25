@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.googlecode.boost-maven-project</groupId>
 	<artifactId>boost</artifactId>
-	<version>1.53.0-b9</version>
+	<version>1.53.0-b10-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Boost</name>
 	<description>Boost Module</description>
@@ -27,7 +27,7 @@
 		<url>https://code.google.com/p/boost-maven-project/</url>
 		<connection>scm:hg:https://code.google.com/p/boost-maven-project/</connection>
 		<developerConnection>scm:hg:https://code.google.com/p/boost-maven-project/</developerConnection>
-		<tag>release-1.53.0-b9</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<developers>
 		<developer>
