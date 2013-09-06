@@ -35,34 +35,6 @@
 			<name>Gili Tzabari</name>
 		</developer>
 	</developers>
-	<modules>
-		<module>boost-maven-plugin</module>
-		<module>boost-compiler</module>
-		<module>boost-atomic</module>
-		<module>boost-chrono</module>
-		<!--
-		boost-context fails to build under OSX using version 1.53.0 due to
-		http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
-		1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
-		-->
-		<!--<module>boost-context</module>-->
-		<module>boost-date-time</module>
-		<module>boost-filesystem</module>
-		<module>boost-graph</module>
-		<module>boost-iostreams</module>
-		<module>boost-locale</module>
-		<!--<module>boost-log</module>-->
-		<module>boost-math</module>
-		<module>boost-program-options</module>
-		<module>boost-random</module>
-		<module>boost-regex</module>
-		<module>boost-serialization</module>
-		<module>boost-signals</module>
-		<module>boost-system</module>
-		<module>boost-test</module>
-		<module>boost-thread</module>
-		<module>boost-wave</module>
-	</modules>
 	<build>
 		<plugins>
 			<plugin>
@@ -112,84 +84,421 @@
 	</properties>
 	<profiles>
 		<profile>
-			<id>build-api</id>
+			<!-- The portable modules -->
+			<id>portable-modules</id>
 			<activation>
-				<property>
-					<name>!skipBoostApi</name>
-				</property>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 			<modules>
 				<module>boost-api</module>
+				<module>boost-maven-plugin</module>
 			</modules>
 		</profile>
+		<!-- The platform-specific modules -->
 		<profile>
 			<id>windows-i386-msvc-debug</id>
+			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
+			<modules>
+				<module>boost-compiler</module>
+				<module>boost-atomic</module>
+				<module>boost-chrono</module>
+				<!--
+				boost-context fails to build under OSX using version 1.53.0 due to
+				http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
+				1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+				-->
+				<!--<module>boost-context</module>-->
+				<module>boost-date-time</module>
+				<module>boost-filesystem</module>
+				<module>boost-graph</module>
+				<module>boost-iostreams</module>
+				<module>boost-locale</module>
+				<!--<module>boost-log</module>-->
+				<module>boost-math</module>
+				<module>boost-program-options</module>
+				<module>boost-random</module>
+				<module>boost-regex</module>
+				<module>boost-serialization</module>
+				<module>boost-signals</module>
+				<module>boost-system</module>
+				<module>boost-test</module>
+				<module>boost-thread</module>
+				<module>boost-wave</module>
+			</modules>
 			<properties>
 				<boost.classifier>windows-i386-msvc-debug</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>windows-i386-msvc-release</id>
+			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
+			<modules>
+				<module>boost-compiler</module>
+				<module>boost-atomic</module>
+				<module>boost-chrono</module>
+				<!--
+				boost-context fails to build under OSX using version 1.53.0 due to
+				http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
+				1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+				-->
+				<!--<module>boost-context</module>-->
+				<module>boost-date-time</module>
+				<module>boost-filesystem</module>
+				<module>boost-graph</module>
+				<module>boost-iostreams</module>
+				<module>boost-locale</module>
+				<!--<module>boost-log</module>-->
+				<module>boost-math</module>
+				<module>boost-program-options</module>
+				<module>boost-random</module>
+				<module>boost-regex</module>
+				<module>boost-serialization</module>
+				<module>boost-signals</module>
+				<module>boost-system</module>
+				<module>boost-test</module>
+				<module>boost-thread</module>
+				<module>boost-wave</module>
+			</modules>
 			<properties>
 				<boost.classifier>windows-i386-msvc-release</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>windows-amd64-msvc-debug</id>
+			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
+			<modules>
+				<module>boost-compiler</module>
+				<module>boost-atomic</module>
+				<module>boost-chrono</module>
+				<!--
+				boost-context fails to build under OSX using version 1.53.0 due to
+				http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
+				1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+				-->
+				<!--<module>boost-context</module>-->
+				<module>boost-date-time</module>
+				<module>boost-filesystem</module>
+				<module>boost-graph</module>
+				<module>boost-iostreams</module>
+				<module>boost-locale</module>
+				<!--<module>boost-log</module>-->
+				<module>boost-math</module>
+				<module>boost-program-options</module>
+				<module>boost-random</module>
+				<module>boost-regex</module>
+				<module>boost-serialization</module>
+				<module>boost-signals</module>
+				<module>boost-system</module>
+				<module>boost-test</module>
+				<module>boost-thread</module>
+				<module>boost-wave</module>
+			</modules>
 			<properties>
 				<boost.classifier>windows-amd64-msvc-debug</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>windows-amd64-msvc-release</id>
+			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
+			<modules>
+				<module>boost-compiler</module>
+				<module>boost-atomic</module>
+				<module>boost-chrono</module>
+				<!--
+				boost-context fails to build under OSX using version 1.53.0 due to
+				http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
+				1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+				-->
+				<!--<module>boost-context</module>-->
+				<module>boost-date-time</module>
+				<module>boost-filesystem</module>
+				<module>boost-graph</module>
+				<module>boost-iostreams</module>
+				<module>boost-locale</module>
+				<!--<module>boost-log</module>-->
+				<module>boost-math</module>
+				<module>boost-program-options</module>
+				<module>boost-random</module>
+				<module>boost-regex</module>
+				<module>boost-serialization</module>
+				<module>boost-signals</module>
+				<module>boost-system</module>
+				<module>boost-test</module>
+				<module>boost-thread</module>
+				<module>boost-wave</module>
+			</modules>
 			<properties>
 				<boost.classifier>windows-amd64-msvc-release</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>linux-i386-gcc-debug</id>
+			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
+			<modules>
+				<module>boost-compiler</module>
+				<module>boost-atomic</module>
+				<module>boost-chrono</module>
+				<!--
+				boost-context fails to build under OSX using version 1.53.0 due to
+				http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
+				1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+				-->
+				<!--<module>boost-context</module>-->
+				<module>boost-date-time</module>
+				<module>boost-filesystem</module>
+				<module>boost-graph</module>
+				<module>boost-iostreams</module>
+				<module>boost-locale</module>
+				<!--<module>boost-log</module>-->
+				<module>boost-math</module>
+				<module>boost-program-options</module>
+				<module>boost-random</module>
+				<module>boost-regex</module>
+				<module>boost-serialization</module>
+				<module>boost-signals</module>
+				<module>boost-system</module>
+				<module>boost-test</module>
+				<module>boost-thread</module>
+				<module>boost-wave</module>
+			</modules>
 			<properties>
 				<boost.classifier>linux-i386-gcc-debug</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>linux-i386-gcc-release</id>
+			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
+			<modules>
+				<module>boost-compiler</module>
+				<module>boost-atomic</module>
+				<module>boost-chrono</module>
+				<!--
+				boost-context fails to build under OSX using version 1.53.0 due to
+				http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
+				1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+				-->
+				<!--<module>boost-context</module>-->
+				<module>boost-date-time</module>
+				<module>boost-filesystem</module>
+				<module>boost-graph</module>
+				<module>boost-iostreams</module>
+				<module>boost-locale</module>
+				<!--<module>boost-log</module>-->
+				<module>boost-math</module>
+				<module>boost-program-options</module>
+				<module>boost-random</module>
+				<module>boost-regex</module>
+				<module>boost-serialization</module>
+				<module>boost-signals</module>
+				<module>boost-system</module>
+				<module>boost-test</module>
+				<module>boost-thread</module>
+				<module>boost-wave</module>
+			</modules>
 			<properties>
 				<boost.classifier>linux-i386-gcc-release</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>linux-amd64-gcc-debug</id>
+			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
+			<modules>
+				<module>boost-compiler</module>
+				<module>boost-atomic</module>
+				<module>boost-chrono</module>
+				<!--
+				boost-context fails to build under OSX using version 1.53.0 due to
+				http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
+				1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+				-->
+				<!--<module>boost-context</module>-->
+				<module>boost-date-time</module>
+				<module>boost-filesystem</module>
+				<module>boost-graph</module>
+				<module>boost-iostreams</module>
+				<module>boost-locale</module>
+				<!--<module>boost-log</module>-->
+				<module>boost-math</module>
+				<module>boost-program-options</module>
+				<module>boost-random</module>
+				<module>boost-regex</module>
+				<module>boost-serialization</module>
+				<module>boost-signals</module>
+				<module>boost-system</module>
+				<module>boost-test</module>
+				<module>boost-thread</module>
+				<module>boost-wave</module>
+			</modules>
 			<properties>
 				<boost.classifier>linux-amd64-gcc-debug</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>linux-amd64-gcc-release</id>
+			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
+			<modules>
+				<module>boost-compiler</module>
+				<module>boost-atomic</module>
+				<module>boost-chrono</module>
+				<!--
+				boost-context fails to build under OSX using version 1.53.0 due to
+				http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
+				1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+				-->
+				<!--<module>boost-context</module>-->
+				<module>boost-date-time</module>
+				<module>boost-filesystem</module>
+				<module>boost-graph</module>
+				<module>boost-iostreams</module>
+				<module>boost-locale</module>
+				<!--<module>boost-log</module>-->
+				<module>boost-math</module>
+				<module>boost-program-options</module>
+				<module>boost-random</module>
+				<module>boost-regex</module>
+				<module>boost-serialization</module>
+				<module>boost-signals</module>
+				<module>boost-system</module>
+				<module>boost-test</module>
+				<module>boost-thread</module>
+				<module>boost-wave</module>
+			</modules>
 			<properties>
 				<boost.classifier>linux-amd64-gcc-release</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>mac-i386-gcc-debug</id>
+			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
+			<modules>
+				<module>boost-compiler</module>
+				<module>boost-atomic</module>
+				<module>boost-chrono</module>
+				<!--
+				boost-context fails to build under OSX using version 1.53.0 due to
+				http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
+				1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+				-->
+				<!--<module>boost-context</module>-->
+				<module>boost-date-time</module>
+				<module>boost-filesystem</module>
+				<module>boost-graph</module>
+				<module>boost-iostreams</module>
+				<module>boost-locale</module>
+				<!--<module>boost-log</module>-->
+				<module>boost-math</module>
+				<module>boost-program-options</module>
+				<module>boost-random</module>
+				<module>boost-regex</module>
+				<module>boost-serialization</module>
+				<module>boost-signals</module>
+				<module>boost-system</module>
+				<module>boost-test</module>
+				<module>boost-thread</module>
+				<module>boost-wave</module>
+			</modules>
 			<properties>
 				<boost.classifier>mac-i386-gcc-debug</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>mac-i386-gcc-release</id>
+			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
+			<modules>
+				<module>boost-compiler</module>
+				<module>boost-atomic</module>
+				<module>boost-chrono</module>
+				<!--
+				boost-context fails to build under OSX using version 1.53.0 due to
+				http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
+				1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+				-->
+				<!--<module>boost-context</module>-->
+				<module>boost-date-time</module>
+				<module>boost-filesystem</module>
+				<module>boost-graph</module>
+				<module>boost-iostreams</module>
+				<module>boost-locale</module>
+				<!--<module>boost-log</module>-->
+				<module>boost-math</module>
+				<module>boost-program-options</module>
+				<module>boost-random</module>
+				<module>boost-regex</module>
+				<module>boost-serialization</module>
+				<module>boost-signals</module>
+				<module>boost-system</module>
+				<module>boost-test</module>
+				<module>boost-thread</module>
+				<module>boost-wave</module>
+			</modules>
 			<properties>
 				<boost.classifier>mac-i386-gcc-release</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>mac-amd64-gcc-debug</id>
+			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
+			<modules>
+				<module>boost-compiler</module>
+				<module>boost-atomic</module>
+				<module>boost-chrono</module>
+				<!--
+				boost-context fails to build under OSX using version 1.53.0 due to
+				http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
+				1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+				-->
+				<!--<module>boost-context</module>-->
+				<module>boost-date-time</module>
+				<module>boost-filesystem</module>
+				<module>boost-graph</module>
+				<module>boost-iostreams</module>
+				<module>boost-locale</module>
+				<!--<module>boost-log</module>-->
+				<module>boost-math</module>
+				<module>boost-program-options</module>
+				<module>boost-random</module>
+				<module>boost-regex</module>
+				<module>boost-serialization</module>
+				<module>boost-signals</module>
+				<module>boost-system</module>
+				<module>boost-test</module>
+				<module>boost-thread</module>
+				<module>boost-wave</module>
+			</modules>
 			<properties>
 				<boost.classifier>mac-amd64-gcc-debug</boost.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>mac-amd64-gcc-release</id>
+			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
+			<modules>
+				<module>boost-compiler</module>
+				<module>boost-atomic</module>
+				<module>boost-chrono</module>
+				<!--
+				boost-context fails to build under OSX using version 1.53.0 due to
+				http://boost.2283326.n4.nabble.com/Context-Building-32-bit-Context-td4636075.html. Version
+				1.54.0 seems to work, but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
+				-->
+				<!--<module>boost-context</module>-->
+				<module>boost-date-time</module>
+				<module>boost-filesystem</module>
+				<module>boost-graph</module>
+				<module>boost-iostreams</module>
+				<module>boost-locale</module>
+				<!--<module>boost-log</module>-->
+				<module>boost-math</module>
+				<module>boost-program-options</module>
+				<module>boost-random</module>
+				<module>boost-regex</module>
+				<module>boost-serialization</module>
+				<module>boost-signals</module>
+				<module>boost-system</module>
+				<module>boost-test</module>
+				<module>boost-thread</module>
+				<module>boost-wave</module>
+			</modules>
 			<properties>
 				<boost.classifier>mac-amd64-gcc-release</boost.classifier>
 			</properties>
