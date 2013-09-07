@@ -1,10 +1,8 @@
 package com.googlecode.boostmavenproject;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -31,9 +29,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,31 +44,23 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.twdata.maven.mojoexecutor.MojoExecutor;
-import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
-import org.twdata.maven.mojoexecutor.MojoExecutor.ExecutionEnvironment;
 
 /**
- * Downloads and compiles the Boost C++ library.
+ * Downloads and packages the Boost C++ library source-code.
  * <p/>
  * @author Gili Tzabari
  */
-@Mojo(name = "generate-binaries", defaultPhase = LifecyclePhase.COMPILE)
-public class GenerateBinariesMojo
+@Mojo(name = "get-sources", defaultPhase = LifecyclePhase.COMPILE)
+public class GetSourcesMojo
 	extends AbstractMojo
 {
 	/**
@@ -90,29 +77,12 @@ public class GenerateBinariesMojo
 			throw new MojoExecutionException("Unexpected version: " + pluginVersion);
 		return pluginVersion.substring(0, index);
 	}
-	/**
-	 * The release platform.
-	 */
-	@SuppressFBWarnings("UWF_UNWRITTEN_FIELD")
-	@Parameter(property = "classifier", required = true, readonly = true)
-	private String classifier;
-	/**
-	 * Extra arguments to pass to the build process.
-	 */
-	@Parameter
-	private List<String> arguments;
-	@SuppressFBWarnings("UWF_UNWRITTEN_FIELD")
-	@Component
-	private BuildPluginManager pluginManager;
 	@SuppressFBWarnings(
 		{
 			"UWF_UNWRITTEN_FIELD", "NP_UNWRITTEN_FIELD"
 		})
 	@Parameter(property = "project", required = true, readonly = true)
 	private MavenProject project;
-	@SuppressFBWarnings("UWF_UNWRITTEN_FIELD")
-	@Parameter(property = "session", required = true, readonly = true)
-	private MavenSession session;
 
 	@Override
 	@SuppressFBWarnings("NP_UNWRITTEN_FIELD")
@@ -122,126 +92,28 @@ public class GenerateBinariesMojo
 		PluginDescriptor pluginDescriptor = (PluginDescriptor) getPluginContext().
 			get("pluginDescriptor");
 		String version = getBoostVersion(pluginDescriptor.getVersion());
-		String extension;
-		List<String> bootstrapCommand;
+		// We assume that all modules contain the same sources, so we use the Windows version
+		String extension = "zip";
 
-		String addressModel;
-		if (classifier.contains("-i386-"))
-			addressModel = "32";
-		else if (classifier.contains("-amd64-"))
-			addressModel = "64";
-		else
-			throw new MojoExecutionException("Unexpected boost.classifier: " + classifier);
-
-		String buildMode;
-		if (classifier.contains("-debug"))
-			buildMode = "debug";
-		else if (classifier.contains("-release"))
-			buildMode = "release";
-		else
-			throw new MojoExecutionException("Unexpected boost.classifier: " + classifier);
-		Runtime runtime = Runtime.getRuntime();
-
-		// --hash prevents the output path from exceeding the 255-character filesystem limit
-		// REFERENCE: https://svn.boost.org/trac/boost/ticket/5155
-		//
-		// boost-context fails to build under OSX using version 1.53.0. Version 1.54.0 seems to work,
-		// but fails later on due to https://svn.boost.org/trac/boost/ticket/8800
-		LinkedList<String> bjamCommand = Lists.newLinkedList(Lists.newArrayList(
-			"address-model=" + addressModel, "--stagedir=.", "--without-python",
-			"--without-mpi", "--without-context", "--layout=system",
-			"variant=" + buildMode, "link=shared", "threading=multi", "runtime-link=shared", "stage", "-j",
-			String.valueOf(runtime.availableProcessors()), "--hash"));
-
-		if (classifier.startsWith("windows-"))
-		{
-			extension = "zip";
-			bootstrapCommand = ImmutableList.of("cmd.exe", "/c", "bootstrap.bat");
-			bjamCommand.addAll(0, ImmutableList.of("cmd.exe", "/c", "b2"));
-		}
-		else if (classifier.startsWith("linux-") || classifier.startsWith("mac-"))
-		{
-			extension = "tar.gz";
-			bootstrapCommand = ImmutableList.of("./bootstrap.sh");
-			bjamCommand.addAll(0, ImmutableList.of("./bjam"));
-		}
-		else
-			throw new MojoExecutionException("Unexpected classifier: " + classifier);
-
-		Path target = Paths.get(project.getBuild().getDirectory(), "dependency/boost");
+		Path targetPath = Paths.get(project.getBuild().getDirectory(), "dependency/boost");
 		try
 		{
 			Path archive = download(new URL(
 				"http://sourceforge.net/projects/boost/files/boost/" + version +
 				"/boost_" + version.replace('.', '_') + "." + extension + "?use_mirror=autoselect"));
-			if (Files.notExists(target.resolve("lib")))
+			if (Files.notExists(targetPath.resolve("lib")))
 			{
-				deleteRecursively(target);
+				deleteRecursively(targetPath);
 
 				// Directories not normalized, begin by unpacking the binaries
-				extract(archive, target);
-				normalizeDirectories(target);
+				extract(archive, targetPath);
+				normalizeDirectories(targetPath);
 			}
 		}
 		catch (IOException e)
 		{
 			throw new MojoExecutionException("", e);
 		}
-
-		// Build boost
-		exec(new ProcessBuilder(bootstrapCommand).directory(target.toFile()));
-		exec(new ProcessBuilder(bjamCommand).directory(target.toFile()));
-	}
-
-	/**
-	 * Executes an external command.
-	 * <p/>
-	 * @param process the command to execute
-	 * @throws MojoExecutionException if the unpack operation fails
-	 */
-	private void exec(ProcessBuilder process)
-		throws MojoExecutionException
-	{
-		Plugin execPlugin = MojoExecutor.plugin("org.codehaus.mojo",
-			"exec-maven-plugin", "1.2.1");
-		Element executableElement = new Element("executable", process.command().get(0));
-
-		List<Element> argumentsList = Lists.newArrayList();
-		List<String> command = process.command();
-		for (String entry: command.subList(1, command.size()))
-			argumentsList.add(new Element("argument", entry));
-		if (arguments != null)
-		{
-			for (String entry: arguments)
-				argumentsList.add(new Element("argument", entry));
-		}
-
-		File workingDirectory = process.directory();
-		if (workingDirectory == null)
-			workingDirectory = new File(System.getProperty("user.dir"));
-		Element workingDirectoryElement = new Element("workingDirectory", workingDirectory.
-			getAbsolutePath());
-
-		Element argumentsElement = new Element("arguments", argumentsList.toArray(
-			new Element[argumentsList.size()]));
-		List<Element> environmentVariables = Lists.newArrayList();
-		for (Entry<String, String> entry: process.environment().entrySet())
-		{
-			// Skip empty values.
-			//
-			// WORKAROUND: http://jira.codehaus.org/browse/MNG-5248
-			String value = entry.getValue();
-			if (!value.isEmpty())
-				environmentVariables.add(new Element(entry.getKey(), entry.getValue()));
-		}
-		Element environmentVariablesElement = new Element("environmentVariables", environmentVariables.
-			toArray(new Element[environmentVariables.size()]));
-
-		Xpp3Dom configuration = MojoExecutor.configuration(executableElement, workingDirectoryElement,
-			argumentsElement, environmentVariablesElement);
-		ExecutionEnvironment environment = MojoExecutor.executionEnvironment(project, session,
-			pluginManager);
-		MojoExecutor.executeMojo(execPlugin, "exec", configuration, environment);
 	}
 
 	/**

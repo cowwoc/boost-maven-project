@@ -12,26 +12,17 @@
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.6</version>
+				<groupId>com.googlecode.boost-maven-project</groupId>
+				<artifactId>boost-maven-plugin</artifactId>
+				<version>${project.version}</version>
 				<executions>
 					<execution>
+						<id>boost-compile</id>
 						<goals>
-							<goal>unpack</goal>
+							<goal>get-sources</goal>
 						</goals>
 						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>${project.groupId}</groupId>
-									<artifactId>boost-compiler</artifactId>
-									<classifier>${boost.classifier}</classifier>
-									<version>${project.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<includes>boost/**</includes>
-									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
-								</artifactItem>
-							</artifactItems>
+							<classifier>${boost.classifier}</classifier>
 						</configuration>
 					</execution>
 				</executions>
