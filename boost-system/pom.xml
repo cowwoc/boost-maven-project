@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.53.0-b13-SNAPSHOT</version>
+		<version>1.53.0-b13</version>
 	</parent>
 	<artifactId>boost-system</artifactId>
 	<name>Boost System</name>
