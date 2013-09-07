@@ -29,6 +29,7 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -267,7 +268,12 @@ public class GetSourcesMojo
 				}
 			}
 
-			// Move extracted filess from tempDir to target.
+			// Add read permission if necessary
+			boolean osSupportsPosix = !System.getProperty("os.name").toLowerCase().startsWith("windows");
+			if (osSupportsPosix)
+				addReadable(tempDir);
+
+			// Move extracted files from tempDir to target.
 			// Can't use Files.move() because tempDir might reside on a different drive than target
 			copyDirectory(tempDir, target);
 			deleteRecursively(tempDir);
@@ -276,6 +282,62 @@ public class GetSourcesMojo
 		{
 			throw new IOException("Could not uncompress: " + source, e);
 		}
+	}
+
+	/**
+	 * Adds the owner-read permission to a path and its descendants.
+	 * <p>
+	 * NOTE: This method is not thread-safe.
+	 * <p>
+	 * @param path the path to process
+	 * @throws IOException if an I/O error occurs
+	 */
+	private void addReadable(final Path path) throws IOException
+	{
+		Files.walkFileTree(path, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE,
+			new FileVisitor<Path>()
+			{
+				@Override
+				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+				throws IOException
+				{
+					Set<PosixFilePermission> permissions = Files.getPosixFilePermissions(dir);
+					if (!permissions.contains(PosixFilePermission.OWNER_READ))
+					{
+						Set<PosixFilePermission> newPermissions = new HashSet<>(permissions);
+						newPermissions.add(PosixFilePermission.OWNER_READ);
+						Files.setPosixFilePermissions(dir, newPermissions);
+					}
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
+				{
+					Set<PosixFilePermission> permissions = Files.getPosixFilePermissions(file);
+					if (!permissions.contains(PosixFilePermission.OWNER_READ))
+					{
+						Set<PosixFilePermission> newPermissions = new HashSet<>(permissions);
+						newPermissions.add(PosixFilePermission.OWNER_READ);
+						Files.setPosixFilePermissions(file, newPermissions);
+					}
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult visitFileFailed(Path file, IOException e) throws IOException
+				{
+					throw e;
+				}
+
+				@Override
+				public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException
+				{
+					if (e != null)
+						throw e;
+					return FileVisitResult.CONTINUE;
+				}
+			});
 	}
 
 	/**

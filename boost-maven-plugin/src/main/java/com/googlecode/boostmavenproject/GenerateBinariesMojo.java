@@ -395,7 +395,7 @@ public class GenerateBinariesMojo
 				}
 			}
 
-			// Move extracted filess from tempDir to target.
+			// Move extracted files from tempDir to target.
 			// Can't use Files.move() because tempDir might reside on a different drive than target
 			copyDirectory(tempDir, target);
 			deleteRecursively(tempDir);
