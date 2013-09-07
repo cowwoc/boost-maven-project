@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.googlecode.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.53.0-b2-SNAPSHOT</version>
+		<version>1.53.0-b11-SNAPSHOT</version>
 	</parent>
 	<artifactId>boost-log</artifactId>
 	<name>Boost Log</name>
@@ -50,4 +50,12 @@
 			</plugin>
 		</plugins>
 	</build>
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>boost-compiler</artifactId>
+			<version>${project.version}</version>
+			<classifier>${boost.classifier}</classifier>
+		</dependency>
+	</dependencies>
 </project>
