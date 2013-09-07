@@ -12,18 +12,15 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.googlecode.boost-maven-project</groupId>
+				<groupId>${project.groupId}</groupId>
 				<artifactId>boost-maven-plugin</artifactId>
 				<version>${project.version}</version>
 				<executions>
 					<execution>
-						<id>boost-compile</id>
+						<id>unpack-api</id>
 						<goals>
-							<goal>get-sources</goal>
+							<goal>unpack-api</goal>
 						</goals>
-						<configuration>
-							<classifier>${boost.classifier}</classifier>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

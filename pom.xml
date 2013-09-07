@@ -83,15 +83,25 @@
 		<arguments />
 	</properties>
 	<profiles>
-		<!-- The cross-platform modules -->
 		<profile>
 			<id>portable</id>
 			<modules>
-				<module>boost-api</module>
 				<module>boost-maven-plugin</module>
 			</modules>
 		</profile>
-		<!-- The platform-specific modules -->
+		<profile>
+			<id>api</id>
+			<modules>
+				<module>boost-api</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>windows-sources</id>
+			<modules>
+				<module>boost-sources-plugin</module>
+				<module>boost-sources</module>
+			</modules>
+		</profile>
 		<profile>
 			<id>windows-i386-msvc-debug</id>
 			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
@@ -229,6 +239,13 @@
 			</properties>
 		</profile>
 		<profile>
+			<id>linux-sources</id>
+			<modules>
+				<module>boost-sources-plugin</module>
+				<module>boost-sources</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>linux-i386-gcc-debug</id>
 			<!-- Maven requires duplication. See http://stackoverflow.com/a/18490480/14731 -->
 			<modules>
@@ -363,6 +380,13 @@
 			<properties>
 				<boost.classifier>linux-amd64-gcc-release</boost.classifier>
 			</properties>
+		</profile>
+		<profile>
+			<id>mac-sources</id>
+			<modules>
+				<module>boost-sources-plugin</module>
+				<module>boost-sources</module>
+			</modules>
 		</profile>
 		<profile>
 			<id>mac-i386-gcc-debug</id>

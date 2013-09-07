@@ -20,10 +20,11 @@
 					<execution>
 						<id>boost-compile</id>
 						<goals>
-							<goal>generate-binaries</goal>
+							<goal>compile</goal>
 						</goals>
 						<configuration>
 							<classifier>${boost.classifier}</classifier>
+							<sources.classifier>${sources.classifier}</sources.classifier>
 						</configuration>
 					</execution>
 				</executions>
@@ -64,5 +65,85 @@
 			<artifactId>boost-maven-plugin</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>boost-sources</artifactId>
+			<version>${project.version}</version>
+			<classifier>${sources.classifier}</classifier>
+		</dependency>
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>windows-i386-msvc-debug</id>
+			<properties>
+				<sources.classifier>windows</sources.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>windows-i386-msvc-release</id>
+			<properties>
+				<sources.classifier>windows</sources.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>windows-amd64-msvc-debug</id>
+			<properties>
+				<sources.classifier>windows</sources.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>windows-amd64-msvc-release</id>
+			<properties>
+				<sources.classifier>windows</sources.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>linux-i386-gcc-debug</id>
+			<properties>
+				<sources.classifier>linux</sources.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>linux-i386-gcc-release</id>
+			<properties>
+				<sources.classifier>linux</sources.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>linux-amd64-gcc-debug</id>
+			<properties>
+				<sources.classifier>linux</sources.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>linux-amd64-gcc-release</id>
+			<properties>
+				<sources.classifier>linux</sources.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>mac-i386-gcc-debug</id>
+			<properties>
+				<sources.classifier>mac</sources.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>mac-i386-gcc-release</id>
+			<properties>
+				<sources.classifier>mac</sources.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>mac-amd64-gcc-debug</id>
+			<properties>
+				<sources.classifier>mac</sources.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>mac-amd64-gcc-release</id>
+			<properties>
+				<sources.classifier>mac</sources.classifier>
+			</properties>
+		</profile>
+	</profiles>
 </project>
