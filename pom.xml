@@ -81,6 +81,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<arguments />
+		<skip.deploy.boost.maven.plugin>true</skip.deploy.boost.maven.plugin>
 	</properties>
 	<profiles>
 		<profile>
@@ -94,6 +95,9 @@
 			<modules>
 				<module>boost-api</module>
 			</modules>
+			<properties>
+				<skip.deploy.boost.maven.plugin>false</skip.deploy.boost.maven.plugin>
+			</properties>
 		</profile>
 		<profile>
 			<id>windows-sources</id>
@@ -101,6 +105,9 @@
 				<module>boost-sources-plugin</module>
 				<module>boost-sources</module>
 			</modules>
+			<properties>
+				<sources.classifier>windows</sources.classifier>
+			</properties>
 		</profile>
 		<profile>
 			<id>windows-i386-msvc-debug</id>
@@ -134,6 +141,7 @@
 			</modules>
 			<properties>
 				<boost.classifier>windows-i386-msvc-debug</boost.classifier>
+				<sources.classifier>windows</sources.classifier>
 			</properties>
 		</profile>
 		<profile>
@@ -168,6 +176,7 @@
 			</modules>
 			<properties>
 				<boost.classifier>windows-i386-msvc-release</boost.classifier>
+				<sources.classifier>windows</sources.classifier>
 			</properties>
 		</profile>
 		<profile>
@@ -202,6 +211,7 @@
 			</modules>
 			<properties>
 				<boost.classifier>windows-amd64-msvc-debug</boost.classifier>
+				<sources.classifier>windows</sources.classifier>
 			</properties>
 		</profile>
 		<profile>
@@ -236,6 +246,7 @@
 			</modules>
 			<properties>
 				<boost.classifier>windows-amd64-msvc-release</boost.classifier>
+				<sources.classifier>windows</sources.classifier>
 			</properties>
 		</profile>
 		<profile>
@@ -244,6 +255,9 @@
 				<module>boost-sources-plugin</module>
 				<module>boost-sources</module>
 			</modules>
+			<properties>
+				<sources.classifier>linux</sources.classifier>
+			</properties>
 		</profile>
 		<profile>
 			<id>linux-i386-gcc-debug</id>
@@ -277,6 +291,7 @@
 			</modules>
 			<properties>
 				<boost.classifier>linux-i386-gcc-debug</boost.classifier>
+				<sources.classifier>linux</sources.classifier>
 			</properties>
 		</profile>
 		<profile>
@@ -311,6 +326,7 @@
 			</modules>
 			<properties>
 				<boost.classifier>linux-i386-gcc-release</boost.classifier>
+				<sources.classifier>linux</sources.classifier>
 			</properties>
 		</profile>
 		<profile>
@@ -345,6 +361,7 @@
 			</modules>
 			<properties>
 				<boost.classifier>linux-amd64-gcc-debug</boost.classifier>
+				<sources.classifier>linux</sources.classifier>
 			</properties>
 		</profile>
 		<profile>
@@ -379,6 +396,7 @@
 			</modules>
 			<properties>
 				<boost.classifier>linux-amd64-gcc-release</boost.classifier>
+				<sources.classifier>linux</sources.classifier>
 			</properties>
 		</profile>
 		<profile>
@@ -387,6 +405,9 @@
 				<module>boost-sources-plugin</module>
 				<module>boost-sources</module>
 			</modules>
+			<properties>
+				<sources.classifier>mac</sources.classifier>
+			</properties>
 		</profile>
 		<profile>
 			<id>mac-i386-gcc-debug</id>
@@ -420,6 +441,7 @@
 			</modules>
 			<properties>
 				<boost.classifier>mac-i386-gcc-debug</boost.classifier>
+				<sources.classifier>mac</sources.classifier>
 			</properties>
 		</profile>
 		<profile>
@@ -454,6 +476,7 @@
 			</modules>
 			<properties>
 				<boost.classifier>mac-i386-gcc-release</boost.classifier>
+				<sources.classifier>mac</sources.classifier>
 			</properties>
 		</profile>
 		<profile>
@@ -488,6 +511,7 @@
 			</modules>
 			<properties>
 				<boost.classifier>mac-amd64-gcc-debug</boost.classifier>
+				<sources.classifier>mac</sources.classifier>
 			</properties>
 		</profile>
 		<profile>
@@ -522,6 +546,7 @@
 			</modules>
 			<properties>
 				<boost.classifier>mac-amd64-gcc-release</boost.classifier>
+				<sources.classifier>mac</sources.classifier>
 			</properties>
 		</profile>
 		<profile>

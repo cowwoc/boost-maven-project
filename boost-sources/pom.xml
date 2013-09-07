@@ -22,7 +22,7 @@
 							<goal>get-sources</goal>
 						</goals>
 						<configuration>
-							<classifier>${classifier}</classifier>
+							<classifier>${sources.classifier}</classifier>
 						</configuration>
 					</execution>
 				</executions>
@@ -57,7 +57,7 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
-							<classifier>${classifier}</classifier>
+							<classifier>${sources.classifier}</classifier>
 							<classesDirectory>${project.build.directory}/dependency/boost</classesDirectory>
 						</configuration>
 					</execution>
@@ -72,24 +72,4 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
-	<profiles>
-		<profile>
-			<id>windows-sources</id>
-			<properties>
-				<classifier>windows</classifier>
-			</properties>
-		</profile>
-		<profile>
-			<id>linux-sources</id>
-			<properties>
-				<classifier>linux</classifier>
-			</properties>
-		</profile>
-		<profile>
-			<id>mac-sources</id>
-			<properties>
-				<classifier>mac</classifier>
-			</properties>
-		</profile>
-	</profiles>
 </project>
