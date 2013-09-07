@@ -83,12 +83,9 @@
 		<arguments />
 	</properties>
 	<profiles>
+		<!-- The cross-platform modules -->
 		<profile>
-			<!-- The portable modules -->
-			<id>portable-modules</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
+			<id>portable</id>
 			<modules>
 				<module>boost-api</module>
 				<module>boost-maven-plugin</module>
