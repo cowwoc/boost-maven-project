@@ -1,4 +1,4 @@
-A Maven project for building the Boost C++ Libraries. See [the documentation](wiki/Building_Instructions.md) for further instructions.
+A Maven project for building the Boost C++ Libraries. See [the documentation](wiki/Build_Instructions.md) for further instructions.
 
 User discussion group: https://groups.google.com/forum/#!forum/boost-maven-project-users
 
