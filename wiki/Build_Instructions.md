@@ -50,4 +50,4 @@ Examples:
 * portable -> api -> windows-sources -> windows-i386-msvc-debug -> windows-i386-msvc-release
 * portable -> linux-sources -> linux-i386-gcc-debug -> linux-amd64-gcc-debug
 
-See [Building for Ubuntu](Building for Ubuntu) for Ubuntu-specific instructions.
+See [Build for Ubuntu](Build_for_Ubuntu.md) for Ubuntu-specific instructions.
