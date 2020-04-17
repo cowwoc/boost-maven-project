@@ -10,6 +10,14 @@
 	<artifactId>boost-api</artifactId>
 	<name>Boost API</name>
 	<description>Boost API Module</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>boost-sources</artifactId>
+			<classifier>${sources.classifier}</classifier>
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
