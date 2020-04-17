@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.googlecode.boost-maven-project</groupId>
+		<groupId>com.github.cowwoc.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.53.0-b14-SNAPSHOT</version>
+		<version>1.71.0-b1-SNAPSHOT</version>
 	</parent>
 	<artifactId>boost-sources</artifactId>
 	<name>Boost Sources</name>
@@ -12,9 +13,8 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.googlecode.boost-maven-project</groupId>
+				<groupId>${project.groupId}</groupId>
 				<artifactId>boost-sources-plugin</artifactId>
-				<version>${project.version}</version>
 				<executions>
 					<execution>
 						<id>boost-sources</id>
@@ -30,7 +30,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.7</version>
 				<configuration>
 					<!--
 						The sources cache is just used to speed up the building process. It should not be
@@ -41,17 +40,9 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
 				<executions>
 					<execution>
-						<id>main-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>attachment-jar</id>
+						<id>default-jar</id>
 						<phase>package</phase>
 						<goals>
 							<goal>jar</goal>
@@ -65,11 +56,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>boost-sources-plugin</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
 </project>

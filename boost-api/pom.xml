@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.googlecode.boost-maven-project</groupId>
+		<groupId>com.github.cowwoc.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.53.0-b14-SNAPSHOT</version>
+		<version>1.71.0-b1-SNAPSHOT</version>
 	</parent>
 	<artifactId>boost-api</artifactId>
 	<name>Boost API</name>
@@ -12,21 +13,31 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>boost-maven-plugin</artifactId>
-				<version>${project.version}</version>
+				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>unpack-api</id>
 						<goals>
-							<goal>unpack-api</goal>
+							<goal>unpack</goal>
 						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>boost-sources</artifactId>
+									<classifier>${sources.classifier}</classifier>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<includes>boost/**</includes>
+									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
 				<configuration>
 					<classesDirectory>${project.build.directory}/dependency/boost</classesDirectory>
 					<includes>

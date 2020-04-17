@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.github.cowwoc.boost-maven-project</groupId>
+		<artifactId>boost</artifactId>
+		<version>1.71.0-b1-SNAPSHOT</version>
+	</parent>
+	<artifactId>boost-container</artifactId>
+	<name>Boost Container</name>
+	<description>
+		A library that implements several well-known containers, including STL containers. The aim of the
+		library is to offer advanced features not present in standard containers or to offer the latest
+		standard draft features for compilers that don't comply with the latest C++ standard.
+	</description>
+	<build>
+		<directory>${basedir}/target/${boost.classifier}</directory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>boost-compiler</artifactId>
+									<classifier>${boost.classifier}</classifier>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<includes>lib/*boost_container*</includes>
+									<outputDirectory>${project.build.directory}/dependency/boost</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<classifier>${boost.classifier}</classifier>
+					<classesDirectory>${project.build.directory}/dependency/boost</classesDirectory>
+					<includes>
+						<include>lib/**</include>
+					</includes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>boost-compiler</artifactId>
+			<classifier>${boost.classifier}</classifier>
+		</dependency>
+	</dependencies>
+</project>

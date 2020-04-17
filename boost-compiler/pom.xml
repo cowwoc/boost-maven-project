@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.googlecode.boost-maven-project</groupId>
+		<groupId>com.github.cowwoc.boost-maven-project</groupId>
 		<artifactId>boost</artifactId>
-		<version>1.53.0-b14-SNAPSHOT</version>
+		<version>1.71.0-b1-SNAPSHOT</version>
 	</parent>
 	<artifactId>boost-compiler</artifactId>
 	<name>Boost Compiler</name>
@@ -13,9 +14,8 @@
 		<directory>${basedir}/target/${boost.classifier}</directory>
 		<plugins>
 			<plugin>
-				<groupId>com.googlecode.boost-maven-project</groupId>
+				<groupId>${project.groupId}</groupId>
 				<artifactId>boost-maven-plugin</artifactId>
-				<version>${project.version}</version>
 				<executions>
 					<execution>
 						<id>boost-compile</id>
@@ -31,7 +31,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
 				<configuration>
 					<classifier>${boost.classifier}</classifier>
 					<classesDirectory>${project.build.directory}/dependency/boost</classesDirectory>
@@ -52,24 +51,10 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.7</version>
 				<configuration>
 					<skip>true</skip>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>boost-maven-plugin</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>boost-sources</artifactId>
-			<version>${project.version}</version>
-			<classifier>${sources.classifier}</classifier>
-		</dependency>
-	</dependencies>
 </project>

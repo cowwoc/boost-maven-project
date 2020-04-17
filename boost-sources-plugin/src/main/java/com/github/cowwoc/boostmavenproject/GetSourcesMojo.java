@@ -1,11 +1,5 @@
-package com.googlecode.boostmavenproject;
+package com.github.cowwoc.boostmavenproject;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -14,45 +8,65 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
- * Downloads and unpacks the Boost C++ API.
- * <p/>
- * @author Gili Tzabari
+ * Downloads and caches the Boost sources.
  */
-@Mojo(name = "unpack-api", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
-public class UnpackApiMojo
+@Mojo(name = "get-sources", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
+public class GetSourcesMojo
 	extends AbstractMojo
 {
-	@SuppressFBWarnings("UWF_UNWRITTEN_FIELD")
+	/**
+	 * The release platform.
+	 */
+	@Parameter(property = "classifier", required = true, readonly = true)
+	private String classifier;
 	@Parameter(property = "project", required = true, readonly = true)
 	private MavenProject project;
 	/**
 	 * The project version.
 	 */
-	@SuppressFBWarnings("UWF_UNWRITTEN_FIELD")
 	@Parameter(property = "project.version")
 	private String projectVersion;
 
 	@Override
-	@SuppressFBWarnings("NP_UNWRITTEN_FIELD")
 	public void execute()
 		throws MojoExecutionException
 	{
-		Path target = Paths.get(project.getBuild().getDirectory(), "dependency/boost");
-		String extension = "zip";
+		final Path target = Paths.get(project.getBuild().getDirectory(), "dependency/boost");
+
+		String extension;
+		switch (classifier)
+		{
+			case "windows":
+			{
+				extension = "zip";
+				break;
+			}
+			case "linux":
+			case "mac":
+			{
+				extension = "tar.gz";
+				break;
+			}
+			default:
+				throw new MojoExecutionException("Unexpected classifier: " + classifier);
+		}
+
 		String boostVersion = Mojos.projectToBoostVersion(projectVersion);
 		Log log = getLog();
 		try
 		{
-			Path archive = Mojos.download(new URL(
-				"http://sourceforge.net/projects/boost/files/boost/" + boostVersion +
-				"/boost_" + boostVersion.replace('.', '_') + "." + extension + "?use_mirror=autoselect"),
+			Path archive = Mojos.download(new URL("https://dl.bintray.com/boostorg/release/" + boostVersion +
+					"/source/boost_" + boostVersion.replace('.', '_') + "." + extension),
 				Paths.get(project.getBuild().getDirectory()), log);
-			if (Files.notExists(target.resolve("bin")))
+			if (Files.notExists(target.resolve("bootstrap.sh")))
 			{
-				Mojos.deleteRecursively(target);
-
-				// Directories not normalized, begin by unpacking the sources
 				if (log.isInfoEnabled())
 					log.info("Extracting " + archive + " to " + target);
 				Mojos.extract(archive, target, log);

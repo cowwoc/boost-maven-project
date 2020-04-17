@@ -1,0 +1,8 @@
+syntax: glob
+target/
+
+.idea/
+*.iml
+
+deploy.bat
+release.properties
